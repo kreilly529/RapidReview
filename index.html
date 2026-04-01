@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrintMail Solutions - Employee Review Form</title>
+<style>
+  :root { --primary: #1F4E79; --accent: #2E75B6; --green: #548235; --red: #C00000; --orange: #FF9800; --gray: #666; --light: #f5f7fa; --border: #ddd; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #333; }
+  .navbar { background: var(--primary); color: #fff; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .navbar h1 { font-size: 20px; font-weight: 600; }
+  .navbar .subtitle { font-size: 13px; opacity: 0.8; }
+  .navbar .nav-right { display: flex; align-items: center; gap: 20px; }
+  .navbar .manager-name { font-size: 14px; opacity: 0.9; }
+  .navbar .btn-switch { padding: 8px 16px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+  .navbar .btn-switch:hover { background: rgba(255,255,255,0.3); }
+  .container { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
+  .login-screen { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+  .login-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 48px 40px; max-width: 420px; text-align: center; }
+  .login-card .company-name { font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+  .login-card .login-title { font-size: 18px; color: #444; margin-bottom: 32px; }
+  .login-card label { text-align: left; display: block; font-weight: 600; margin-bottom: 8px; color: var(--primary); }
+  .login-card select { width: 100%; margin-bottom: 24px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+  .login-card .btn-login { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .login-card .btn-login:hover { background: var(--primary); }
+  .btn-ms-login { width: 100%; padding: 14px 20px; background: #fff; color: #5e5e5e; border: 1px solid #8c8c8c; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: background 0.2s; }
+  .btn-ms-login:hover { background: #f3f3f3; }
+  .btn-ms-login svg { width: 21px; height: 21px; flex-shrink: 0; }
+  .login-error { color: var(--red); font-size: 13px; margin-top: 12px; display: none; }
+  .admin-checkbox { text-align: left; margin-bottom: 20px; }
+  .admin-checkbox input { margin-right: 8px; }
+  .admin-checkbox label { display: inline; margin-bottom: 0; font-weight: 400; color: #666; font-size: 13px; }
+  .hidden { display: none !important; }
+  .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); padding: 28px 32px; margin-bottom: 20px; }
+  .card h2 { color: var(--primary); font-size: 18px; margin-bottom: 16px; border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
+  .period-selector { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .period-badge { padding: 8px 16px; border-radius: 6px; border: 2px solid var(--border); background: #fff; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.2s; }
+  .period-badge.current { background: var(--green); color: #fff; border-color: var(--green); }
+  .period-badge.current::after { content: " CURRENT"; font-size: 11px; margin-left: 4px; }
+  .period-badge.past { color: var(--gray); cursor: default; }
+  .read-only-banner { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 14px 16px; margin-bottom: 20px; font-size: 14px; color: #856404; display: none; }
+  .read-only-banner.visible { display: block; }
+  label { font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px; color: #444; }
+  select, input[type="text"], textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; font-family: inherit; }
+  select:focus, input:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(46,117,182,0.15); }
+  select:disabled, input:disabled, textarea:disabled { background: #f9f9f9; color: #999; cursor: not-allowed; }
+  textarea { resize: vertical; min-height: 100px; }
+  textarea.read-only-area { background: #f9f9f9; color: #666; border: 1px solid #ddd; }
+  .form-row { margin-bottom: 16px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .gate-group { display: flex; gap: 16px; margin: 8px 0; }
+  .gate-btn { padding: 12px 28px; border: 2px solid var(--border); border-radius: 8px; background: #fff; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .gate-btn:hover { border-color: var(--accent); }
+  .gate-btn.selected-yes { background: #E8F5E9; border-color: var(--green); color: var(--green); }
+  .gate-btn.selected-no { background: #FFEBEE; border-color: var(--red); color: var(--red); }
+  .gate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .gate-warning { background: #FFF3E0; border-left: 4px solid var(--orange); padding: 12px 16px; margin-top: 12px; border-radius: 0 6px 6px 0; font-size: 13px; display: none; color: #856404; }
+  .gate-warning.visible { display: block; }
+  .collapsible-header { cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 4px 0; user-select: none; }
+  .collapsible-header:hover { color: var(--accent); }
+  .arrow { font-size: 16px; transition: transform 0.2s; }
+  .arrow.collapsed { transform: rotate(0deg); }
+  .arrow.expanded { transform: rotate(90deg); }
+  .collapsible-content { display: none; margin-top: 16px; }
+  .collapsible-content.visible { display: block; }
+  .collapsible-section { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+  .collapsible-section h3 { color: var(--primary); font-size: 16px; margin: 0; }
+  .job-profile-item { margin-bottom: 16px; }
+  .job-profile-item label { margin-bottom: 8px; }
+  .score-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+  .score-btn-new { flex: 1; padding: 14px 8px; border: 2px solid var(--border); border-radius: 8px; background: #fff; cursor: pointer; transition: all 0.2s; text-align: center; font-family: inherit; }
+  .score-btn-new:hover { border-color: var(--accent); background: #f0f6ff; }
+  .score-btn-new.score-selected { border-color: var(--accent); background: #e8f0fe; box-shadow: 0 2px 8px rgba(46,117,182,0.2); }
+  .score-btn-num { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+  .score-btn-new.score-selected .score-btn-num { color: var(--accent); }
+  .score-btn-label { font-size: 11px; color: var(--gray); line-height: 1.3; }
+  .score-btn-new.score-selected .score-btn-label { color: var(--primary); font-weight: 600; }
+  .score-desc { font-size: 13px; color: #555; padding: 12px 16px; background: var(--light); border-radius: 6px; border-left: 3px solid var(--accent); margin-top: 4px; }
+  @media (max-width: 768px) { .score-selector { flex-wrap: wrap; } .score-btn-new { flex: 0 0 calc(33% - 6px); } }
+  .rubric-display.visible { display: block; }
+  .perf-card { background: linear-gradient(135deg, #f5f9ff 0%, #eef4fb 100%); border: 2px solid #b8d4f0; border-radius: 10px; padding: 20px 24px; margin-bottom: 8px; }
+  .perf-card h3 { color: var(--primary); font-size: 16px; margin-bottom: 14px; border-bottom: 1px solid #d4e3f7; padding-bottom: 8px; }
+  .perf-section { margin-bottom: 16px; }
+  .perf-section-title { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; padding: 4px 10px; background: #dde9f6; border-radius: 4px; display: inline-block; }
+  .perf-measure { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #fff; border: 1px solid #e0e8f0; border-radius: 6px; margin-bottom: 6px; }
+  .perf-measure-name { font-weight: 600; font-size: 14px; color: #333; flex: 1; }
+  .perf-measure-pct { font-size: 14px; color: var(--gray); margin-right: 12px; min-width: 60px; text-align: right; }
+  .perf-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; min-width: 90px; text-align: center; }
+  .perf-badge-0 { background: #ffcdd2; color: #b71c1c; }
+  .perf-badge-1 { background: #ffe0b2; color: #e65100; }
+  .perf-badge-2 { background: #fff9c4; color: #f57f17; }
+  .perf-badge-3 { background: #c8e6c9; color: #2e7d32; }
+  .perf-overall { background: #fff; border: 2px solid var(--accent); border-radius: 8px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+  .perf-overall-label { font-weight: 700; font-size: 15px; color: var(--primary); }
+  .bonus-card { background: #f0f8ff; border: 2px solid #4a90e2; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .bonus-card h4 { color: var(--primary); margin-bottom: 16px; }
+  .bonus-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd; }
+  .bonus-row:last-child { border-bottom: none; }
+  .bonus-label { font-weight: 600; color: #555; }
+  .bonus-value { font-size: 16px; font-weight: 700; color: var(--primary); }
+  .bonus-amount { font-size: 24px; font-weight: 700; color: var(--green); }
+  .btn { padding: 12px 28px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--primary); }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-green:hover { background: #3d6427; }
+  .btn-outline { background: #fff; color: var(--accent); border: 2px solid var(--accent); }
+  .btn-outline:hover { background: #EBF5FF; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+  .actions.hidden { display: none; }
+  .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .summary-table th, .summary-table td { padding: 8px 10px; border: 1px solid var(--border); }
+  .summary-table th { background: var(--primary); color: #fff; font-size: 12px; }
+  .summary-table tr:nth-child(even) { background: var(--light); }
+  .summary-table .complete { color: var(--green); font-weight: 600; }
+  .summary-table .pending { color: var(--orange); }
+  .cv-total { font-size: 16px; font-weight: 700; color: var(--primary); margin-top: 12px; padding: 12px; background: var(--light); border-radius: 6px; }
+  @media print {
+    body { background: #fff; }
+    .navbar, .login-screen, .actions, .btn-switch { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div>
+    <h1>PrintMail Solutions</h1>
+    <p class="subtitle">Employee Performance Review System</p>
+  </div>
+  <div class="nav-right">
+    <span class="manager-name" id="managerDisplay" style="display: none;"></span>
+    <button class="btn-switch" id="btnHome" onclick="goHome()" style="display: none;">&#8962; Home</button>
+    <button class="btn-switch" id="btnSwitch" onclick="msalLogout()" style="display: none;">Sign Out</button>
+  </div>
+</div>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="company-name">PrintMail Solutions</div>
+    <div class="login-title">Performance Review Portal</div>
+    <button class="btn-ms-login" onclick="msalLogin()">
+      <svg viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+      Sign in with Microsoft
+    </button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<div id="mainContent" class="container hidden">
+  
+  <div class="card">
+    <div class="period-selector" id="periodSelector"></div>
+    <div class="read-only-banner" id="readOnlyBanner">This period is read-only. All inputs and action buttons are disabled.</div>
+  </div>
+
+  <div id="bonusOverviewCard" class="card" style="border-left:4px solid var(--primary);padding:24px;">
+    <h2 style="margin:0 0 12px 0;font-size:20px;color:var(--primary);">Semi-Annual Performance Bonus Review</h2>
+    <p style="font-size:14px;color:#333;margin:0 0 20px 0;line-height:1.6;">This review supports two company goals: to <strong>drive strategic change</strong> through our 4DX framework, and to <strong>reward employees</strong> for job excellence and behaviors that align with our core values. Bonus payouts are tied directly to measurable performance.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div style="background:var(--light);border-radius:8px;padding:16px;">
+        <div style="font-weight:700;color:var(--primary);font-size:14px;margin-bottom:8px;">Bonus Formula</div>
+        <div style="font-size:15px;font-weight:600;color:#333;margin-bottom:6px;">(Annual Salary &divide; 2) &times; Bonus Rate &times; Overall Score %</div>
+        <div style="font-size:12px;color:#888;">Bonus rate is set per employee. Overall score is based on the three categories below.</div>
+      </div>
+      <div style="background:var(--light);border-radius:8px;padding:16px;">
+        <div style="font-weight:700;color:var(--primary);font-size:14px;margin-bottom:8px;">Scoring Breakdown</div>
+        <div style="display:flex;gap:12px;">
+          <div style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:8px 4px;border:1px solid #dde3eb;">
+            <div style="font-size:18px;font-weight:700;color:var(--primary);">15</div>
+            <div style="font-size:11px;color:#888;">4DX</div>
+          </div>
+          <div style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:8px 4px;border:1px solid #dde3eb;">
+            <div style="font-size:18px;font-weight:700;color:var(--primary);">10</div>
+            <div style="font-size:11px;color:#888;">CJR</div>
+          </div>
+          <div style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:8px 4px;border:1px solid #dde3eb;">
+            <div style="font-size:18px;font-weight:700;color:var(--primary);">5</div>
+            <div style="font-size:11px;color:#888;">Values</div>
+          </div>
+          <div style="flex:1;text-align:center;background:var(--primary);border-radius:6px;padding:8px 4px;">
+            <div style="font-size:18px;font-weight:700;color:#fff;">30</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.7);">Total</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-weight:700;color:var(--primary);font-size:14px;margin-bottom:8px;">How It Works</div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font-size:13px;color:#444;line-height:1.5;">
+      <span style="background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">1</span>
+      <span><strong>Confirm Eligibility</strong> — Attest that the employee meets the bonus policy (active status, good standing, no PIP).</span>
+      <span style="background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">2</span>
+      <span><strong>Score Performance</strong> — 4DX scores load automatically. You rate Core Job Responsibilities (0-10) and Core Values (0-5).</span>
+      <span style="background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">3</span>
+      <span><strong>Review &amp; Submit</strong> — Add comments, verify the bonus calculation, then save or generate the PDF.</span>
+    </div>
+
+    <div id="teamRoster" style="margin-top:20px;display:none;">
+      <div style="font-weight:700;color:var(--primary);font-size:14px;margin-bottom:10px;">Your Team</div>
+      <div id="teamRosterContent"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Select Employee</h2>
+    <div class="form-row">
+      <label for="employeeSelect">Employee</label>
+      <select id="employeeSelect" onchange="loadEmployee()" style="font-size:15px;padding:10px;">
+        <option value="">-- Select Employee --</option>
+      </select>
+    </div>
+    <div id="employeeInfo" style="display: none;">
+      <div class="form-grid">
+        <div>
+          <label>Employee Name</label>
+          <input type="text" id="empName" disabled>
+        </div>
+        <div>
+          <label>Job Title</label>
+          <input type="text" id="empTitle" disabled>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Department</label>
+        <input type="text" id="empDept" disabled>
+      </div>
+    </div>
+  </div>
+
+  <div id="coreJobCard" class="card hidden">
+    <h2>1. Core Job Performance — Eligibility Gate</h2>
+    <div style="background: #f5f7fa; border-radius: 8px; padding: 20px; margin-bottom: 16px; font-size: 13px; line-height: 1.8; color: #444;">
+      <strong style="color: #1F4E79; font-size: 14px;">Bonus Eligibility Policy</strong>
+      <ul style="margin: 10px 0 0 18px; padding: 0;">
+        <li><strong>Active payrolled employee</strong> — Must be an active payrolled employee during the entire semi-annual period (180 day period) to be eligible, with exception of new hires and employees on approved leave of absence (see below).</li>
+        <li><strong>New hires</strong> — New hires will obtain eligibility in the next full quarter following their hire. Bonus is prorated to half the semi-annual amount earned if eligibility is obtained halfway through the semi-annual period. Manager will review quantitative measures with new hire during onboarding.</li>
+        <li><strong>Leave of absence</strong> — Employees on leave of absence in excess of 5 days during a quarter of the semi-annual period will not be eligible for full payment. The bonus will be prorated to half the semi-annual amount for a full quarter worked within the semi-annual period.</li>
+        <li><strong>Active at time of distribution</strong> — Must be an active payrolled employee at the time of distribution to be eligible for payment. Should an employee leave PrintMail prior to the distribution of payment, for any reason (voluntary or involuntary), no payment will be made by PrintMail.</li>
+        <li><strong>Good standing</strong> — Employee must be in good standing with the company. Employees who are subject to active disciplinary action, on a Performance Improvement Plan (PIP), or have documented performance issues with their core job functions are not eligible for bonus payment.</li>
+      </ul>
+    </div>
+    <label style="margin-bottom: 8px; font-size: 15px; color: #1F4E79;">Based on the policy above, does this employee meet all eligibility requirements?</label>
+    <div class="gate-group">
+      <button class="gate-btn" onclick="selectGate(this, 'yes')">Yes — I attest that this employee meets the Bonus Eligibility Policy</button>
+      <button class="gate-btn" onclick="selectGate(this, 'no')">No — Employee does not meet the Bonus Eligibility Policy</button>
+    </div>
+    <div class="gate-warning" id="gateWarning">This employee does not meet one or more eligibility requirements. The bonus amount will be $0. The remainder of the review will still be completed for documentation and development purposes.</div>
+  </div>
+
+  <div id="scoringBandsCard" class="card hidden">
+    <h2>Scoring Reference</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div style="background:var(--light);border-radius:8px;padding:16px;">
+        <div style="font-weight:700;color:var(--primary);margin-bottom:10px;font-size:14px;">WIG/Lead Measure Scoring Bands</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #ddd;"><span class="perf-badge perf-badge-0" style="min-width:70px;">Failure</span></td><td style="padding:6px 10px;border-bottom:1px solid #ddd;">Below 80%</td><td style="padding:6px 10px;border-bottom:1px solid #ddd;font-weight:700;">0 pts</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #ddd;"><span class="perf-badge perf-badge-1" style="min-width:70px;">Under Achv</span></td><td style="padding:6px 10px;border-bottom:1px solid #ddd;">80% – 89.9%</td><td style="padding:6px 10px;border-bottom:1px solid #ddd;font-weight:700;">1 pt</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #ddd;"><span class="perf-badge perf-badge-2" style="min-width:70px;">Good Job</span></td><td style="padding:6px 10px;border-bottom:1px solid #ddd;">90% – 105%</td><td style="padding:6px 10px;border-bottom:1px solid #ddd;font-weight:700;">2 pts</td></tr>
+          <tr><td style="padding:6px 10px;"><span class="perf-badge perf-badge-3" style="min-width:70px;">Over Achv</span></td><td style="padding:6px 10px;">Above 105%</td><td style="padding:6px 10px;font-weight:700;">3 pts</td></tr>
+        </table>
+      </div>
+      <div style="background:var(--light);border-radius:8px;padding:16px;">
+        <div style="font-weight:700;color:var(--primary);margin-bottom:10px;font-size:14px;">Section Weights</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <tr><td style="padding:5px 10px;border-bottom:1px solid #ddd;font-weight:700;">4DX Performance</td><td style="padding:5px 10px;border-bottom:1px solid #ddd;">15 pts max (normalized)</td></tr>
+          <tr><td style="padding:5px 10px;border-bottom:1px solid #ddd;font-weight:700;">Core Job Responsibilities</td><td style="padding:5px 10px;border-bottom:1px solid #ddd;">10 pts max (0-10 scale)</td></tr>
+          <tr><td style="padding:5px 10px;border-bottom:1px solid #ddd;font-weight:700;">Core Values</td><td style="padding:5px 10px;border-bottom:1px solid #ddd;">5 pts max (0-5 scale)</td></tr>
+          <tr style="background:var(--primary);color:#fff;"><td style="padding:5px 10px;font-weight:700;">Total</td><td style="padding:5px 10px;font-weight:700;">30 pts max</td></tr>
+        </table>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:#888;">WIG scores receive a <b>2× multiplier</b>. Lead measures receive a <b>1× multiplier</b>. Raw 4DX points are normalized to a 15-point scale.</div>
+  </div>
+
+  <div id="perfSummaryCard" class="card hidden">
+    <h2>3. 4DX Performance Summary</h2>
+    <div id="perfSummaryContent"></div>
+  </div>
+
+  <div id="coreJobCard2" class="card hidden">
+    <h2>4. Core Job Responsibilities</h2>
+    <p style="font-size:14px;color:#666;margin-bottom:16px;">Review the employee's KPI metrics from ADP below, then rate their overall core job performance on a 0-10 scale.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:var(--light);border-radius:8px;padding:14px;">
+        <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">KPI 1</label>
+        <div id="kpi1Display" style="font-size:14px;font-weight:600;color:var(--primary);">—</div>
+      </div>
+      <div style="background:var(--light);border-radius:8px;padding:14px;">
+        <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">KPI 2</label>
+        <div id="kpi2Display" style="font-size:14px;font-weight:600;color:var(--primary);">—</div>
+      </div>
+      <div style="background:var(--light);border-radius:8px;padding:14px;">
+        <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">KPI 3</label>
+        <div id="kpi3Display" style="font-size:14px;font-weight:600;color:var(--primary);">—</div>
+      </div>
+    </div>
+    <div id="coreJobContent"></div>
+    <div class="cv-total" id="cjrTotal" style="display: none;"></div>
+  </div>
+
+  <div id="coreValuesCard" class="card hidden">
+    <h2>5. Core Values Assessment</h2>
+    <p style="font-size:14px;color:#666;margin-bottom:16px;">Rate the employee's overall demonstration of PrintMail's core values on a 0-5 scale.</p>
+    <div id="coreValuesContent"></div>
+    <div class="cv-total" id="cvTotal" style="display: none;"></div>
+  </div>
+
+  <div id="bonusCard" class="card hidden">
+    <h2>6. Bonus Calculation</h2>
+    <div id="bonusContent"></div>
+  </div>
+
+  <div id="managerSummaryCard" class="card hidden">
+    <h2>7. Manager Summary</h2>
+    <div class="form-row">
+      <label for="whatGoing">What is going well?</label>
+      <textarea id="whatGoing" placeholder="Describe strengths, accomplishments, and positive contributions..."></textarea>
+    </div>
+    <div class="form-row">
+      <label for="needsImprovement">What needs improvement?</label>
+      <div style="background:#FFF3E0;border-left:4px solid var(--orange);padding:12px 16px;border-radius:0 6px 6px 0;font-size:13px;color:#6d4c00;margin-bottom:10px;line-height:1.6;">
+        <strong>Required:</strong> Any score below "Meets Expectations" in the sections above — 4DX Performance, Core Job Responsibilities, or Core Values — <u>must</u> be specifically documented here. For each area rated below expectations, describe the specific deficiency, provide concrete examples, and outline what improvement is expected. Reviews with below-expectations scores that lack specific documentation will be returned for revision.
+      </div>
+      <textarea id="needsImprovement" placeholder="Describe any areas where improvement is needed."></textarea>
+    </div>
+  </div>
+
+  <div id="completedReviewsCard" class="card hidden">
+    <h2>Completed Reviews</h2>
+    <table class="summary-table" id="reviewsTable">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Period</th>
+          <th>Status</th>
+          <th>Eligibility</th>
+          <th>Bonus</th>
+        </tr>
+      </thead>
+      <tbody id="reviewsTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="actions hidden" id="actionButtons">
+    <button class="btn btn-outline" onclick="saveDraft()">Save Draft</button>
+    <button class="btn btn-primary" onclick="generateDocument()">Generate Review Document</button>
+    <button class="btn btn-green" onclick="submitReview()">Submit Review</button>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<script>
+let EMPLOYEES = [{"name": "Chris Ardis", "folder": "Customer Health Index", "scoreboard": "Director of Operations (Chris)"}, {"name": "Anil Reddy Baddam", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Angel)"}, {"name": "Bill Barber", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Abishai)"}, {"name": "Anna Bell", "folder": "Customer Health Index", "scoreboard": "Supervisor of Client Management (Rich)"}, {"name": "Reechik Bhattacharya", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Reechik)"}, {"name": "Kris Blakeney", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Ryan)"}, {"name": "Cheryl Bouc", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Angel)"}, {"name": "Cindy Brown", "folder": "Customer Health Index", "scoreboard": "Supervisor of Client Management (Rich)"}, {"name": "Rich Buscaglia", "folder": "Customer Health Index", "scoreboard": "Supervisor of Client Management (Rich)"}, {"name": "Mario Cardenas", "folder": "Customer Health Index", "scoreboard": "TN Ops Manager (Rudy)"}, {"name": "Kenneth Carl", "folder": "Lead Open to Cash", "scoreboard": "Business Analyst (John)"}, {"name": "Jared Clark", "folder": "Lead Open to Cash", "scoreboard": "IT Project Manager (Becky)"}, {"name": "Amy Dane", "folder": "Customer Health Index", "scoreboard": "PA Ops Manager (Amy)"}, {"name": "Kerry Davis", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Jason)"}, {"name": "Ryan Drews", "folder": "Customer Health Index", "scoreboard": "PA Ops Manager (Amy)"}, {"name": "Wilson Dunlap", "folder": "Customer Health Index", "scoreboard": "Online Services Manager (Chitra)"}, {"name": "Jonah Dunne", "folder": "Customer Health Index", "scoreboard": "Customer Success Manager (Jonah)"}, {"name": "Becky Eaton", "folder": "Lead Open to Cash", "scoreboard": "IT Project Manager (Becky)"}, {"name": "Angela Ferrese", "folder": "Lead Open to Cash", "scoreboard": "SD Manager (TBD)"}, {"name": "John Galantine", "folder": "Lead Open to Cash", "scoreboard": "Business Analyst (John)"}, {"name": "Donna Gordon", "folder": "Customer Health Index", "scoreboard": "TN Ops Manager (Rudy)"}, {"name": "David Greenplate", "folder": "Customer Health Index", "scoreboard": "Supervisor of Client Management (Rich)"}, {"name": "Angel Guerrero", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Angel)"}, {"name": "Vino Gupta", "folder": "Lead Open to Cash", "scoreboard": "Software Delivery Manager (Nisha)"}, {"name": "Michelle Hackney", "folder": "Customer Health Index", "scoreboard": "Supervisor of Client Management (Rich)"}, {"name": "Paul Hascek", "folder": "Lead Open to Cash", "scoreboard": "Online Services (Paul)"}, {"name": "Jared Heim", "folder": "Lead Open to Cash", "scoreboard": "Business Analyst (John)"}, {"name": "Daniel Hoskins", "folder": "Customer Health Index", "scoreboard": "Supervisor of Client Management (Rich)"}, {"name": "Ryan Hubbard", "folder": "Lead Open to Cash", "scoreboard": "VP of Marketing (Brian)"}, {"name": "Tracey Janis", "folder": "Lead Open to Cash", "scoreboard": "IT Project Manager (Becky)"}, {"name": "Chinara Kates", "folder": "Customer Health Index", "scoreboard": "Supervisor of Client Management (Rich)"}, {"name": "Nicholas Kelley", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Ryan)"}, {"name": "Leslie Khan", "folder": "Customer Health Index", "scoreboard": "Online Services Manager (Chitra)"}, {"name": "Ashitha Kunhiraman", "folder": "Lead Open to Cash", "scoreboard": "Business Analyst (John)"}, {"name": "David Leung", "folder": "Customer Health Index", "scoreboard": "Online Services Manager (Chitra)"}, {"name": "Ryan Lynskey", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Ryan)"}, {"name": "Preethi Marineni", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Reechik)"}, {"name": "Ann Marryshow", "folder": "Customer Health Index", "scoreboard": "Supervisor of Client Management (Rich)"}, {"name": "Daniel Martin", "folder": "Lead Open to Cash", "scoreboard": "IT Project Manager (Becky)"}, {"name": "Rudy Micallef", "folder": "Customer Health Index", "scoreboard": "TN Ops Manager (Rudy)"}, {"name": "Paula Moreira", "folder": "Customer Health Index", "scoreboard": "Customer Success Manager (Jonah)"}, {"name": "Gregory Nester", "folder": "Lead Open to Cash", "scoreboard": "VP of Marketing (Brian)"}, {"name": "Jafet Ojeda", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Ryan)"}, {"name": "James Oursler", "folder": "Lead Open to Cash", "scoreboard": "Business Analyst (John)"}, {"name": "Yash Patel", "folder": "Lead Open to Cash", "scoreboard": "Business Analyst (John)"}, {"name": "Jason Pinho", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Jason)"}, {"name": "Jon Price", "folder": "Lead Open to Cash", "scoreboard": "SD Manager (TBD)"}, {"name": "Abishai Rajan", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Abishai)"}, {"name": "Marina Reid", "folder": "Lead Open to Cash", "scoreboard": "Business Analyst (John)"}, {"name": "Keith Reilly", "folder": "PrintMail", "scoreboard": "President"}, {"name": "David Reilly", "folder": "Lead Open to Cash", "scoreboard": "VP Technology and Operations (Dave)"}, {"name": "Brian Reilly", "folder": "Lead Open to Cash", "scoreboard": "VP of Marketing (Brian)"}, {"name": "Gretchen Renaud", "folder": "Customer Health Index", "scoreboard": "VP Customer Success and Strategic Partnerships (Gretchen)"}, {"name": "Mark Renzi", "folder": "Lead Open to Cash", "scoreboard": "SD Manager (TBD)"}, {"name": "Jamal Richardson", "folder": "Customer Health Index", "scoreboard": "PA Ops Manager (Amy)"}, {"name": "Rick Rivera", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Abishai)"}, {"name": "Vimal Roy", "folder": "Lead Open to Cash", "scoreboard": "Technology Operations (Vimal)"}, {"name": "Jenson Samuel", "folder": "Customer Health Index", "scoreboard": "Online Services Manager (Chitra)"}, {"name": "Shakirah Schlenker", "folder": "Lead Open to Cash", "scoreboard": "IT Project Manager (Becky)"}, {"name": "Joe Scholl", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Angel)"}, {"name": "Chris Short", "folder": "Lead Open to Cash", "scoreboard": "Software Delivery Manager (Nisha)"}, {"name": "John Smirga", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Angel)"}, {"name": "Peter Steen", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Abishai)"}, {"name": "Nicole Stewart", "folder": "Lead Open to Cash", "scoreboard": "VP of Marketing (Brian)"}, {"name": "Roopa Teradal", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Jason)"}, {"name": "David Thoma", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Abishai)"}, {"name": "Jim Toohey", "folder": "Lead Open to Cash", "scoreboard": "VP Technology and Operations (Dave)"}, {"name": "Rebecca Van Dyke", "folder": "Lead Open to Cash", "scoreboard": "Director of Client Services (Rebecca)"}, {"name": "Chitra Vasanth", "folder": "Customer Health Index", "scoreboard": "Online Services Manager (Chitra)"}, {"name": "Navya Venigalla", "folder": "Lead Open to Cash", "scoreboard": "SD Manager (TBD)"}, {"name": "Nisha Verghese", "folder": "Lead Open to Cash", "scoreboard": "Software Delivery Manager (Nisha)"}, {"name": "Yehu Woldeamanuel", "folder": "Lead Open to Cash", "scoreboard": "Software Engineer (Reechik)"}, {"name": "Linda Woolbert", "folder": "Customer Health Index", "scoreboard": "Software Engineer (Abishai)"}, {"name": "Patricia Zitkus", "folder": "Lead Open to Cash", "scoreboard": "IT Project Manager (Becky)"}];
+let PERF_DATA = {"Chris Ardis":{"folder":"Customer Health Index","sb":"Director of Operations (Chris)","owner":"Yes","wigName":"Increase EOM Throughput/Hour","wigPct":100.3,"wigScore":2,"wigPts":4,"leads":[{"n":"PA Machine Downtime","p":103.3,"s":2},{"n":"Identify Barriers","p":110.3,"s":3},{"n":"Racami Conversion Process","p":99.5,"s":2},{"n":"STG 2 Customer Health Index","p":247.5,"s":3}],"xps":0,"xpsScore":0,"totalPts":14,"maxPts":18,"overallPct":77.8,"perfLevel":"Average"},"Anil Reddy Baddam":{"folder":"Lead Open to Cash","sb":"Software Engineer (Angel)","owner":"No","wigName":"Approval Functionality","wigPct":100.2,"wigScore":2,"wigPts":4,"leads":[{"n":"Update jobs with Approval Functionality","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":9,"overallPct":66.7,"perfLevel":"Average"},"Bill Barber":{"folder":"Customer Health Index","sb":"Software Engineer (Abishai)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Anna Bell":{"folder":"Customer Health Index","sb":"Supervisor of Client Management (Rich)","owner":"No","wigName":"Customer Health Index","wigPct":99.0,"wigScore":2,"wigPts":4,"leads":[{"n":"CM Customer Touchpoints","p":93.3,"s":2},{"n":"First Touch Resolution","p":118.1,"s":3},{"n":"Tier 1 Documentation","p":44.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":9,"maxPts":15,"overallPct":60.0,"perfLevel":"Average"},"Reechik Bhattacharya":{"folder":"Lead Open to Cash","sb":"Software Engineer (Reechik)","owner":"Yes","wigName":"Reduce Number Of Pages To Onboard a Job By 50%","wigPct":107.4,"wigScore":3,"wigPts":6,"leads":[{"n":"Job Artifacts","p":100,"s":2},{"n":"Job Fields","p":100,"s":2},{"n":"Job Indexes","p":100,"s":2},{"n":"Migrate RYSE UX/UI","p":102.2,"s":2}],"xps":0,"xpsScore":0,"totalPts":14,"maxPts":18,"overallPct":77.8,"perfLevel":"Average"},"Kris Blakeney":{"folder":"Lead Open to Cash","sb":"Software Engineer (Ryan)","owner":"No","wigName":"L & N Redesign Development Elapsed time","wigPct":148.0,"wigScore":3,"wigPts":6,"leads":[{"n":"Build a single composition template using parsing templates","p":100,"s":2},{"n":"Build one or many data parsing templates for each document type","p":0,"s":0},{"n":"Productizing the Redesign","p":53.3,"s":0}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":15,"overallPct":53.3,"perfLevel":"Needs Improvement"},"Cheryl Bouc":{"folder":"Lead Open to Cash","sb":"Software Engineer (Angel)","owner":"No","wigName":"Approval Functionality","wigPct":100.2,"wigScore":2,"wigPts":4,"leads":[{"n":"Update jobs with Approval Functionality","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":9,"overallPct":66.7,"perfLevel":"Average"},"Cindy Brown":{"folder":"Customer Health Index","sb":"Supervisor of Client Management (Rich)","owner":"No","wigName":"Customer Health Index","wigPct":99.0,"wigScore":2,"wigPts":4,"leads":[{"n":"CM Customer Touchpoints","p":93.3,"s":2},{"n":"First Touch Resolution","p":118.1,"s":3},{"n":"Tier 1 Documentation","p":44.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":9,"maxPts":15,"overallPct":60.0,"perfLevel":"Average"},"Rich Buscaglia":{"folder":"Customer Health Index","sb":"Supervisor of Client Management (Rich)","owner":"Yes","wigName":"Customer Health Index","wigPct":99.0,"wigScore":2,"wigPts":4,"leads":[{"n":"CM Customer Touchpoints","p":93.3,"s":2},{"n":"First Touch Resolution","p":118.1,"s":3},{"n":"Tier 1 Documentation","p":44.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":9,"maxPts":15,"overallPct":60.0,"perfLevel":"Average"},"Mario Cardenas":{"folder":"Customer Health Index","sb":"TN Ops Manager (Rudy)","owner":"No","wigName":"TN EOM Throughput/Hour","wigPct":105.2,"wigScore":3,"wigPts":6,"leads":[{"n":"TN Machine Downtime","p":16.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":9,"overallPct":66.7,"perfLevel":"Average"},"Kenneth Carl":{"folder":"Lead Open to Cash","sb":"Business Analyst (John)","owner":"No","wigName":"Project On Time Delivery","wigPct":105.0,"wigScore":2,"wigPts":4,"leads":[{"n":"'BA Responsible' Incident Tickets per Month","p":300,"s":3},{"n":"Create Onboarding Documentation","p":120.8,"s":3},{"n":"Improve QA Protocols","p":126.3,"s":3},{"n":"Test Plan usage","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"Jared Clark":{"folder":"Lead Open to Cash","sb":"IT Project Manager (Becky)","owner":"No","wigName":"oldProject On Time Delivery","wigPct":491.1,"wigScore":3,"wigPts":6,"leads":[{"n":"Commitment Document","p":70.7,"s":0},{"n":"Project Due Date","p":94.0,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Amy Dane":{"folder":"Customer Health Index","sb":"PA Ops Manager (Amy)","owner":"Yes","wigName":"PA EOM Throughput/Hour","wigPct":98.3,"wigScore":2,"wigPts":4,"leads":[{"n":"PA Machine Downtime","p":103.3,"s":2},{"n":"STG 2 Customer Health Index","p":100.1,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Kerry Davis":{"folder":"Customer Health Index","sb":"Software Engineer (Jason)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Ryan Drews":{"folder":"Customer Health Index","sb":"PA Ops Manager (Amy)","owner":"No","wigName":"PA EOM Throughput/Hour","wigPct":98.3,"wigScore":2,"wigPts":4,"leads":[{"n":"PA Machine Downtime","p":103.3,"s":2},{"n":"STG 2 Customer Health Index","p":100.1,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Wilson Dunlap":{"folder":"Customer Health Index","sb":"Online Services Manager (Chitra)","owner":"No","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Automation Test","p":100,"s":2},{"n":"V4 Consumer Application","p":93.8,"s":2}],"xps":0,"xpsScore":0,"totalPts":10,"maxPts":12,"overallPct":83.3,"perfLevel":"Good Job"},"Jonah Dunne":{"folder":"Customer Health Index","sb":"Customer Success Manager (Jonah)","owner":"Yes","wigName":"Quality EBR","wigPct":100,"wigScore":2,"wigPts":4,"leads":[{"n":"Customer Follow-ups","p":100,"s":2},{"n":"Proactive Reachouts","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Becky Eaton":{"folder":"Lead Open to Cash","sb":"IT Project Manager (Becky)","owner":"Yes","wigName":"oldProject On Time Delivery","wigPct":491.1,"wigScore":3,"wigPts":6,"leads":[{"n":"Commitment Document","p":70.7,"s":0},{"n":"Project Due Date","p":94.0,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Angela Ferrese":{"folder":"Lead Open to Cash","sb":"SD Manager (TBD)","owner":"Yes","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"John Galantine":{"folder":"Lead Open to Cash","sb":"Business Analyst (John)","owner":"Yes","wigName":"Project On Time Delivery","wigPct":105.0,"wigScore":2,"wigPts":4,"leads":[{"n":"'BA Responsible' Incident Tickets per Month","p":300,"s":3},{"n":"Create Onboarding Documentation","p":120.8,"s":3},{"n":"Improve QA Protocols","p":126.3,"s":3},{"n":"Test Plan usage","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"Donna Gordon":{"folder":"Customer Health Index","sb":"TN Ops Manager (Rudy)","owner":"No","wigName":"TN EOM Throughput/Hour","wigPct":105.2,"wigScore":3,"wigPts":6,"leads":[{"n":"TN Machine Downtime","p":16.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":9,"overallPct":66.7,"perfLevel":"Average"},"David Greenplate":{"folder":"Customer Health Index","sb":"Supervisor of Client Management (Rich)","owner":"No","wigName":"Customer Health Index","wigPct":99.0,"wigScore":2,"wigPts":4,"leads":[{"n":"CM Customer Touchpoints","p":93.3,"s":2},{"n":"First Touch Resolution","p":118.1,"s":3},{"n":"Tier 1 Documentation","p":44.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":9,"maxPts":15,"overallPct":60.0,"perfLevel":"Average"},"Angel Guerrero":{"folder":"Lead Open to Cash","sb":"Software Engineer (Angel)","owner":"Yes","wigName":"Approval Functionality","wigPct":100.2,"wigScore":2,"wigPts":4,"leads":[{"n":"Update jobs with Approval Functionality","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":9,"overallPct":66.7,"perfLevel":"Average"},"Vino Gupta":{"folder":"Lead Open to Cash","sb":"Software Delivery Manager (Nisha)","owner":"No","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Permanent Incident Corrections","p":385.7,"s":3},{"n":"v4 Requirements Backlog","p":121.4,"s":3},{"n":"Monitoring Alerts","p":39.5,"s":0},{"n":"Requirement Documents","p":300,"s":3}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"Michelle Hackney":{"folder":"Customer Health Index","sb":"Supervisor of Client Management (Rich)","owner":"No","wigName":"Customer Health Index","wigPct":99.0,"wigScore":2,"wigPts":4,"leads":[{"n":"CM Customer Touchpoints","p":93.3,"s":2},{"n":"First Touch Resolution","p":118.1,"s":3},{"n":"Tier 1 Documentation","p":44.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":9,"maxPts":15,"overallPct":60.0,"perfLevel":"Average"},"Paul Hascek":{"folder":"Lead Open to Cash","sb":"Online Services (Paul)","owner":"Yes","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Customer Health Index","p":100,"s":2},{"n":"Monitoring Alerts","p":39.5,"s":0},{"n":"Requirement Documents","p":102.0,"s":2}],"xps":0,"xpsScore":0,"totalPts":10,"maxPts":15,"overallPct":66.7,"perfLevel":"Average"},"Jared Heim":{"folder":"Lead Open to Cash","sb":"Business Analyst (John)","owner":"No","wigName":"Project On Time Delivery","wigPct":105.0,"wigScore":2,"wigPts":4,"leads":[{"n":"'BA Responsible' Incident Tickets per Month","p":300,"s":3},{"n":"Create Onboarding Documentation","p":120.8,"s":3},{"n":"Improve QA Protocols","p":126.3,"s":3},{"n":"Test Plan usage","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"Daniel Hoskins":{"folder":"Customer Health Index","sb":"Supervisor of Client Management (Rich)","owner":"No","wigName":"Customer Health Index","wigPct":99.0,"wigScore":2,"wigPts":4,"leads":[{"n":"CM Customer Touchpoints","p":93.3,"s":2},{"n":"First Touch Resolution","p":118.1,"s":3},{"n":"Tier 1 Documentation","p":44.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":9,"maxPts":15,"overallPct":60.0,"perfLevel":"Average"},"Ryan Hubbard":{"folder":"Lead Open to Cash","sb":"VP of Marketing (Brian)","owner":"No","wigName":"Open to Won","wigPct":169.5,"wigScore":3,"wigPts":6,"leads":[{"n":"Demo Phase Duration","p":229.8,"s":3},{"n":"Discovery Phase Duration","p":226.4,"s":3},{"n":"Q2 Qualify","p":67.4,"s":0}],"xps":0,"xpsScore":0,"totalPts":12,"maxPts":15,"overallPct":80.0,"perfLevel":"Good Job"},"Tracey Janis":{"folder":"Lead Open to Cash","sb":"IT Project Manager (Becky)","owner":"No","wigName":"oldProject On Time Delivery","wigPct":491.1,"wigScore":3,"wigPts":6,"leads":[{"n":"Commitment Document","p":70.7,"s":0},{"n":"Project Due Date","p":94.0,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Chinara Kates":{"folder":"Customer Health Index","sb":"Supervisor of Client Management (Rich)","owner":"No","wigName":"Customer Health Index","wigPct":99.0,"wigScore":2,"wigPts":4,"leads":[{"n":"CM Customer Touchpoints","p":93.3,"s":2},{"n":"First Touch Resolution","p":118.1,"s":3},{"n":"Tier 1 Documentation","p":44.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":9,"maxPts":15,"overallPct":60.0,"perfLevel":"Average"},"Nicholas Kelley":{"folder":"Lead Open to Cash","sb":"Software Engineer (Ryan)","owner":"No","wigName":"L & N Redesign Development Elapsed time","wigPct":148.0,"wigScore":3,"wigPts":6,"leads":[{"n":"Build a single composition template using parsing templates","p":100,"s":2},{"n":"Build one or many data parsing templates for each document type","p":0,"s":0},{"n":"Productizing the Redesign","p":53.3,"s":0}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":15,"overallPct":53.3,"perfLevel":"Needs Improvement"},"Leslie Khan":{"folder":"Customer Health Index","sb":"Online Services Manager (Chitra)","owner":"No","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Automation Test","p":100,"s":2},{"n":"V4 Consumer Application","p":93.8,"s":2}],"xps":0,"xpsScore":0,"totalPts":10,"maxPts":12,"overallPct":83.3,"perfLevel":"Good Job"},"Ashitha Kunhiraman":{"folder":"Lead Open to Cash","sb":"Business Analyst (John)","owner":"No","wigName":"Project On Time Delivery","wigPct":105.0,"wigScore":2,"wigPts":4,"leads":[{"n":"'BA Responsible' Incident Tickets per Month","p":300,"s":3},{"n":"Create Onboarding Documentation","p":120.8,"s":3},{"n":"Improve QA Protocols","p":126.3,"s":3},{"n":"Test Plan usage","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"David Leung":{"folder":"Customer Health Index","sb":"Online Services Manager (Chitra)","owner":"No","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Automation Test","p":100,"s":2},{"n":"V4 Consumer Application","p":93.8,"s":2}],"xps":0,"xpsScore":0,"totalPts":10,"maxPts":12,"overallPct":83.3,"perfLevel":"Good Job"},"Ryan Lynskey":{"folder":"Lead Open to Cash","sb":"Software Engineer (Ryan)","owner":"Yes","wigName":"L & N Redesign Development Elapsed time","wigPct":148.0,"wigScore":3,"wigPts":6,"leads":[{"n":"Build a single composition template using parsing templates","p":100,"s":2},{"n":"Build one or many data parsing templates for each document type","p":0,"s":0},{"n":"Productizing the Redesign","p":53.3,"s":0}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":15,"overallPct":53.3,"perfLevel":"Needs Improvement"},"Preethi Marineni":{"folder":"Lead Open to Cash","sb":"Software Engineer (Reechik)","owner":"No","wigName":"Reduce Number Of Pages To Onboard a Job By 50%","wigPct":107.4,"wigScore":3,"wigPts":6,"leads":[{"n":"Job Artifacts","p":100,"s":2},{"n":"Job Fields","p":100,"s":2},{"n":"Job Indexes","p":100,"s":2},{"n":"Migrate RYSE UX/UI","p":102.2,"s":2}],"xps":0,"xpsScore":0,"totalPts":14,"maxPts":18,"overallPct":77.8,"perfLevel":"Average"},"Ann Marryshow":{"folder":"Customer Health Index","sb":"Supervisor of Client Management (Rich)","owner":"No","wigName":"Customer Health Index","wigPct":99.0,"wigScore":2,"wigPts":4,"leads":[{"n":"CM Customer Touchpoints","p":93.3,"s":2},{"n":"First Touch Resolution","p":118.1,"s":3},{"n":"Tier 1 Documentation","p":44.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":9,"maxPts":15,"overallPct":60.0,"perfLevel":"Average"},"Daniel Martin":{"folder":"Lead Open to Cash","sb":"IT Project Manager (Becky)","owner":"No","wigName":"oldProject On Time Delivery","wigPct":491.1,"wigScore":3,"wigPts":6,"leads":[{"n":"Commitment Document","p":70.7,"s":0},{"n":"Project Due Date","p":94.0,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Rudy Micallef":{"folder":"Customer Health Index","sb":"TN Ops Manager (Rudy)","owner":"Yes","wigName":"TN EOM Throughput/Hour","wigPct":105.2,"wigScore":3,"wigPts":6,"leads":[{"n":"TN Machine Downtime","p":16.0,"s":0}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":9,"overallPct":66.7,"perfLevel":"Average"},"Paula Moreira":{"folder":"Customer Health Index","sb":"Customer Success Manager (Jonah)","owner":"No","wigName":"Quality EBR","wigPct":100,"wigScore":2,"wigPts":4,"leads":[{"n":"Customer Follow-ups","p":100,"s":2},{"n":"Proactive Reachouts","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Gregory Nester":{"folder":"Lead Open to Cash","sb":"VP of Marketing (Brian)","owner":"No","wigName":"Open to Won","wigPct":169.5,"wigScore":3,"wigPts":6,"leads":[{"n":"Demo Phase Duration","p":229.8,"s":3},{"n":"Discovery Phase Duration","p":226.4,"s":3},{"n":"Q2 Qualify","p":67.4,"s":0}],"xps":0,"xpsScore":0,"totalPts":12,"maxPts":15,"overallPct":80.0,"perfLevel":"Good Job"},"Jafet Ojeda":{"folder":"Lead Open to Cash","sb":"Software Engineer (Ryan)","owner":"No","wigName":"L & N Redesign Development Elapsed time","wigPct":148.0,"wigScore":3,"wigPts":6,"leads":[{"n":"Build a single composition template using parsing templates","p":100,"s":2},{"n":"Build one or many data parsing templates for each document type","p":0,"s":0},{"n":"Productizing the Redesign","p":53.3,"s":0}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":15,"overallPct":53.3,"perfLevel":"Needs Improvement"},"James Oursler":{"folder":"Lead Open to Cash","sb":"Business Analyst (John)","owner":"No","wigName":"Project On Time Delivery","wigPct":105.0,"wigScore":2,"wigPts":4,"leads":[{"n":"'BA Responsible' Incident Tickets per Month","p":300,"s":3},{"n":"Create Onboarding Documentation","p":120.8,"s":3},{"n":"Improve QA Protocols","p":126.3,"s":3},{"n":"Test Plan usage","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"Yash Patel":{"folder":"Lead Open to Cash","sb":"Business Analyst (John)","owner":"No","wigName":"Project On Time Delivery","wigPct":105.0,"wigScore":2,"wigPts":4,"leads":[{"n":"'BA Responsible' Incident Tickets per Month","p":300,"s":3},{"n":"Create Onboarding Documentation","p":120.8,"s":3},{"n":"Improve QA Protocols","p":126.3,"s":3},{"n":"Test Plan usage","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"Jason Pinho":{"folder":"Customer Health Index","sb":"Software Engineer (Jason)","owner":"Yes","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Jon Price":{"folder":"Lead Open to Cash","sb":"SD Manager (TBD)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Abishai Rajan":{"folder":"Customer Health Index","sb":"Software Engineer (Abishai)","owner":"Yes","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Marina Reid":{"folder":"Lead Open to Cash","sb":"Business Analyst (John)","owner":"No","wigName":"Project On Time Delivery","wigPct":105.0,"wigScore":2,"wigPts":4,"leads":[{"n":"'BA Responsible' Incident Tickets per Month","p":300,"s":3},{"n":"Create Onboarding Documentation","p":120.8,"s":3},{"n":"Improve QA Protocols","p":126.3,"s":3},{"n":"Test Plan usage","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"Keith Reilly":{"folder":"PrintMail","sb":"President","owner":"Yes","wigName":"Documents Under Management","wigPct":85.0,"wigScore":1,"wigPts":2,"leads":[{"n":"Stage 1 PrintMail","p":100,"s":2},{"n":"Stage 2 PrintMail","p":99.2,"s":2}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":12,"overallPct":50.0,"perfLevel":"Needs Improvement"},"David Reilly":{"folder":"Lead Open to Cash","sb":"VP Technology and Operations (Dave)","owner":"Yes","wigName":"Lead Open to Cash","wigPct":53.0,"wigScore":0,"wigPts":0,"leads":[{"n":"Stage 1 Lead Open to Cash","p":100,"s":2},{"n":"Stage 2 Lead Open to Cash","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":4,"maxPts":12,"overallPct":33.3,"perfLevel":"Failure"},"Brian Reilly":{"folder":"Lead Open to Cash","sb":"VP of Marketing (Brian)","owner":"Yes","wigName":"Open to Won","wigPct":169.5,"wigScore":3,"wigPts":6,"leads":[{"n":"Demo Phase Duration","p":229.8,"s":3},{"n":"Discovery Phase Duration","p":226.4,"s":3},{"n":"Q2 Qualify","p":67.4,"s":0}],"xps":0,"xpsScore":0,"totalPts":12,"maxPts":15,"overallPct":80.0,"perfLevel":"Good Job"},"Gretchen Renaud":{"folder":"Customer Health Index","sb":"VP Customer Success and Strategic Partnerships (Gretchen)","owner":"Yes","wigName":"Quality EBR","wigPct":100,"wigScore":2,"wigPts":4,"leads":[{"n":"STG 1 Customer Health Index","p":95.8,"s":2},{"n":"STG 2 Customer Health Index","p":95.5,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Mark Renzi":{"folder":"Lead Open to Cash","sb":"SD Manager (TBD)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Jamal Richardson":{"folder":"Customer Health Index","sb":"PA Ops Manager (Amy)","owner":"No","wigName":"PA EOM Throughput/Hour","wigPct":98.3,"wigScore":2,"wigPts":4,"leads":[{"n":"PA Machine Downtime","p":103.3,"s":2},{"n":"STG 2 Customer Health Index","p":100.1,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Rick Rivera":{"folder":"Customer Health Index","sb":"Software Engineer (Abishai)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Vimal Roy":{"folder":"Lead Open to Cash","sb":"Technology Operations (Vimal)","owner":"Yes","wigName":"Marketing request turnaround time","wigPct":102.4,"wigScore":2,"wigPts":4,"leads":[{"n":"Lead Open to Cash","p":100,"s":2},{"n":"Stage 1 Lead Open to Cash","p":93.4,"s":2},{"n":"Stage 2 Lead Open to Cash","p":92.5,"s":2}],"xps":0,"xpsScore":0,"totalPts":10,"maxPts":15,"overallPct":66.7,"perfLevel":"Average"},"Jenson Samuel":{"folder":"Customer Health Index","sb":"Online Services Manager (Chitra)","owner":"No","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Automation Test","p":100,"s":2},{"n":"V4 Consumer Application","p":93.8,"s":2}],"xps":0,"xpsScore":0,"totalPts":10,"maxPts":12,"overallPct":83.3,"perfLevel":"Good Job"},"Shakirah Schlenker":{"folder":"Lead Open to Cash","sb":"IT Project Manager (Becky)","owner":"No","wigName":"oldProject On Time Delivery","wigPct":491.1,"wigScore":3,"wigPts":6,"leads":[{"n":"Commitment Document","p":70.7,"s":0},{"n":"Project Due Date","p":94.0,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"},"Joe Scholl":{"folder":"Lead Open to Cash","sb":"Software Engineer (Angel)","owner":"No","wigName":"Approval Functionality","wigPct":100.2,"wigScore":2,"wigPts":4,"leads":[{"n":"Update jobs with Approval Functionality","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":9,"overallPct":66.7,"perfLevel":"Average"},"Chris Short":{"folder":"Lead Open to Cash","sb":"Software Delivery Manager (Nisha)","owner":"No","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Permanent Incident Corrections","p":385.7,"s":3},{"n":"v4 Requirements Backlog","p":121.4,"s":3},{"n":"Monitoring Alerts","p":39.5,"s":0},{"n":"Requirement Documents","p":300,"s":3}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"John Smirga":{"folder":"Lead Open to Cash","sb":"Software Engineer (Angel)","owner":"No","wigName":"Approval Functionality","wigPct":100.2,"wigScore":2,"wigPts":4,"leads":[{"n":"Update jobs with Approval Functionality","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":6,"maxPts":9,"overallPct":66.7,"perfLevel":"Average"},"Peter Steen":{"folder":"Customer Health Index","sb":"Software Engineer (Abishai)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Nicole Stewart":{"folder":"Lead Open to Cash","sb":"VP of Marketing (Brian)","owner":"No","wigName":"Open to Won","wigPct":169.5,"wigScore":3,"wigPts":6,"leads":[{"n":"Demo Phase Duration","p":229.8,"s":3},{"n":"Discovery Phase Duration","p":226.4,"s":3},{"n":"Q2 Qualify","p":67.4,"s":0}],"xps":0,"xpsScore":0,"totalPts":12,"maxPts":15,"overallPct":80.0,"perfLevel":"Good Job"},"Roopa Teradal":{"folder":"Customer Health Index","sb":"Software Engineer (Jason)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"David Thoma":{"folder":"Customer Health Index","sb":"Software Engineer (Abishai)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Jim Toohey":{"folder":"Lead Open to Cash","sb":"VP Technology and Operations (Dave)","owner":"No","wigName":"Lead Open to Cash","wigPct":53.0,"wigScore":0,"wigPts":0,"leads":[{"n":"Stage 1 Lead Open to Cash","p":100,"s":2},{"n":"Stage 2 Lead Open to Cash","p":100,"s":2}],"xps":0,"xpsScore":0,"totalPts":4,"maxPts":12,"overallPct":33.3,"perfLevel":"Failure"},"Rebecca Van Dyke":{"folder":"Lead Open to Cash","sb":"Director of Client Services (Rebecca)","owner":"Yes","wigName":"Project On Time Delivery","wigPct":382.7,"wigScore":3,"wigPts":6,"leads":[{"n":"Lead Open to Cash","p":100,"s":2},{"n":"Stage 1 Lead Open to Cash","p":96.4,"s":2},{"n":"Stage 2 Lead Open to Cash","p":93.4,"s":2}],"xps":0,"xpsScore":0,"totalPts":12,"maxPts":15,"overallPct":80.0,"perfLevel":"Good Job"},"Chitra Vasanth":{"folder":"Customer Health Index","sb":"Online Services Manager (Chitra)","owner":"Yes","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Automation Test","p":100,"s":2},{"n":"V4 Consumer Application","p":93.8,"s":2}],"xps":0,"xpsScore":0,"totalPts":10,"maxPts":12,"overallPct":83.3,"perfLevel":"Good Job"},"Navya Venigalla":{"folder":"Lead Open to Cash","sb":"SD Manager (TBD)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Nisha Verghese":{"folder":"Lead Open to Cash","sb":"Software Delivery Manager (Nisha)","owner":"Yes","wigName":"Incident Tickets","wigPct":192.3,"wigScore":3,"wigPts":6,"leads":[{"n":"Permanent Incident Corrections","p":385.7,"s":3},{"n":"v4 Requirements Backlog","p":121.4,"s":3},{"n":"Monitoring Alerts","p":39.5,"s":0},{"n":"Requirement Documents","p":300,"s":3}],"xps":0,"xpsScore":0,"totalPts":15,"maxPts":18,"overallPct":83.3,"perfLevel":"Good Job"},"Yehu Woldeamanuel":{"folder":"Lead Open to Cash","sb":"Software Engineer (Reechik)","owner":"No","wigName":"Reduce Number Of Pages To Onboard a Job By 50%","wigPct":107.4,"wigScore":3,"wigPts":6,"leads":[{"n":"Job Artifacts","p":100,"s":2},{"n":"Job Fields","p":100,"s":2},{"n":"Job Indexes","p":100,"s":2},{"n":"Migrate RYSE UX/UI","p":102.2,"s":2}],"xps":0,"xpsScore":0,"totalPts":14,"maxPts":18,"overallPct":77.8,"perfLevel":"Average"},"Linda Woolbert":{"folder":"Customer Health Index","sb":"Software Engineer (Abishai)","owner":"No","wigName":"(No H2 2025 data)","wigPct":0,"wigScore":0,"wigPts":0,"leads":[],"xps":0,"xpsScore":0,"totalPts":0,"maxPts":6,"overallPct":0.0,"perfLevel":"Failure"},"Patricia Zitkus":{"folder":"Lead Open to Cash","sb":"IT Project Manager (Becky)","owner":"No","wigName":"oldProject On Time Delivery","wigPct":491.1,"wigScore":3,"wigPts":6,"leads":[{"n":"Commitment Document","p":70.7,"s":0},{"n":"Project Due Date","p":94.0,"s":2}],"xps":0,"xpsScore":0,"totalPts":8,"maxPts":12,"overallPct":66.7,"perfLevel":"Average"}};
+const MGR_DATA = {"David Reilly": ["Chris Ardis", "Paul Hascek", "Rebecca Van Dyke", "Vimal Roy", "Yehu Woldeamanuel"], "Vimal Roy": ["Abishai Rajan", "Angel Guerrero", "Anil Reddy Baddam", "Bill Barber", "Cheryl Bouc", "David Thoma", "Jafet Ojeda", "Joe Scholl", "Kris Blakeney", "Nicholas Kelley", "Rick Rivera", "Ryan Lynskey"], "Yehu Woldeamanuel": ["Preethi Marineni", "Reechik Bhattacharya"], "Rebecca Van Dyke": ["Becky Eaton", "John Galantine", "Rich Buscaglia"], "John Galantine": ["Ashitha Kunhiraman", "James Oursler", "Jared Heim", "Kenneth Carl", "Marina Reid", "Yash Patel"], "Bill Barber": ["Jason Pinho", "Kerry Davis", "Linda Woolbert", "Peter Steen"], "Paul Hascek": ["Chitra Vasanth", "David Leung", "Jenson Samuel", "Navya Venigalla", "Vino Gupta", "Wilson Dunlap"], "Gretchen Renaud": ["Jonah Dunne", "Paula Moreira"], "Keith Reilly": ["Angela Ferrese", "Brian Reilly", "David Reilly", "Gregory Nester", "Gretchen Renaud", "Jim Toohey", "Ryan Hubbard"], "Rudy Micallef": ["Donna Gordon", "Mario Cardenas"], "Suzanne Deasley": ["Chris Short", "Jon Price", "Leslie Khan", "Mark Renzi", "Nisha Verghese", "Roopa Teradal"], "Brian Reilly": ["Nicole Stewart"], "Chris Ardis": ["Amy Dane", "John Smirga", "Rudy Micallef"], "Rich Buscaglia": ["Ann Marryshow", "Anna Bell", "Chinara Kates", "Cindy Brown", "Daniel Hoskins", "David Greenplate", "Michelle Hackney"], "Amy Dane": ["Jamal Richardson", "Ryan Drews"], "Becky Eaton": ["Daniel Martin", "Jared Clark", "Patricia Zitkus", "Shakirah Schlenker", "Tracey Janis"]};
+const CENSUS_DATA = {"Chris Ardis": {"title": "DIROFOPS - Director of Operations", "dept": "000011 - 3500 PM - OPS - Management", "salary": 75000, "reports_to": "David Reilly"}, "Anil Reddy Baddam": {"title": "QSE - Quadient Software Engineer", "dept": "000047 - 2340 OS - Proj Dev", "salary": 75000, "reports_to": "Vimal Roy"}, "Bill Barber": {"title": "SOS - Systems Operations Supervisor", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Vimal Roy"}, "Anna Bell": {"title": "CMII - Client Manager II", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Buscaglia,Richard"}, "Reechik Bhattacharya": {"title": "PENG - Product Engineer", "dept": "000049 - 2510 PM -  Prod Dev", "salary": 75000, "reports_to": "Yehu Woldeamanuel"}, "Kris Blakeney": {"title": "LQSE - Lead Quadient Software Engineer", "dept": "000052 - 2540 PM - Proj Dev", "salary": 75000, "reports_to": "Vimal Roy"}, "Cheryl Bouc": {"title": "VDPS - Variable Data and Print Specialist", "dept": "000006 - 4500 MS - Marketing Services", "salary": 75000, "reports_to": "Vimal Roy"}, "Cindy Brown": {"title": "CMII - Client Manager II", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Buscaglia,Richard"}, "Rich Buscaglia": {"title": "SOCM - Supervisor of Client Management", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Rebecca Van Dyke"}, "Kenneth Carl": {"title": "BAIII - Business Analyst III", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "John Galantine"}, "Jared Clark": {"title": "ITPM - IT Project Manager", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "Eaton,Rebecca L"}, "Amy Dane": {"title": "OPERMNGR - Operations Manager", "dept": "000011 - 3500 PM - OPS - Management", "salary": 75000, "reports_to": "Ardis Sr.,Christopher"}, "Kerry Davis": {"title": "JSE - Junior Support Engineer", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Bill Barber"}, "Ryan Drews": {"title": "INSRTSUP - Inserting Supervisor", "dept": "000011 - 3500 PM - OPS - Management", "salary": 75000, "reports_to": "Dane,Amanda"}, "Wilson Dunlap": {"title": "QABASDET - QA Business Analyst - SDET", "dept": "000045 - 2320 OS - Prod Dev QA", "salary": 75000, "reports_to": "Paul Hascek"}, "Jonah Dunne": {"title": "CSMIII - Customer Success Manager III", "dept": "000007 - 4425 PM - Sales - Outside", "salary": 75000, "reports_to": "Gretchen Renaud"}, "Becky Eaton": {"title": "PMS - Project Management Supervisor", "dept": "000051 - 2530 PM - Proj Del", "salary": 75000, "reports_to": "Rebecca Van Dyke"}, "Angela Ferrese": {"title": "EA - Executive Assistant", "dept": "000024 - 1300 SS - G&A - Exec Mgmt", "salary": 75000, "reports_to": "Keith Reilly"}, "John Galantine": {"title": "BSAS - Business Systems Analyst Supervisor", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "Rebecca Van Dyke"}, "Donna Gordon": {"title": "PRODSUPE - Production Supervisor", "dept": "000011 - 3500 PM - OPS - Management", "salary": 75000, "reports_to": "Rudy Micallef"}, "David Greenplate": {"title": "CSL - Customer Service Lead", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Buscaglia,Richard"}, "Angel Guerrero": {"title": "QSE - Quadient Software Engineer", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "Vimal Roy"}, "Vino Gupta": {"title": "QABAIII - QA Business Analyst III", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "Paul Hascek"}, "Michelle Hackney": {"title": "CMI - Client Manager I", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Buscaglia,Richard"}, "Paul Hascek": {"title": "DOS - Director of Online Services", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "David Reilly"}, "Jared Heim": {"title": "BAIII - Business Analyst III", "dept": "000051 - 2530 PM - Proj Del", "salary": 75000, "reports_to": "John Galantine"}, "Daniel Hoskins": {"title": "CMI - Client Manager I", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Buscaglia,Richard"}, "Ryan Hubbard": {"title": "BDC - Business Development Coordinator", "dept": "000034 - 4430 PM - Sales - Inside", "salary": 75000, "reports_to": "Keith Reilly"}, "Tracey Janis": {"title": "ITPM - IT Project Manager", "dept": "000051 - 2530 PM - Proj Del", "salary": 75000, "reports_to": "Eaton,Rebecca L"}, "Chinara Kates": {"title": "CMDMGD - Client Manager, Direct Mail & Graphic Design", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Buscaglia,Richard"}, "Nicholas Kelley": {"title": "QSE - Quadient Software Engineer", "dept": "000044 - 2310 OS - Prod Dev", "salary": 75000, "reports_to": "Vimal Roy"}, "Leslie Khan": {"title": "SSEII - Senior Software Engineer II", "dept": "000044 - 2310 OS - Prod Dev", "salary": 75000, "reports_to": "Suzanne Deasley"}, "Ryan Lynskey": {"title": "LQSE - Lead Quadient Software Engineer", "dept": "000052 - 2540 PM - Proj Dev", "salary": 75000, "reports_to": "Vimal Roy"}, "Preethi Marineni": {"title": "ATE - Automation Test Engineer", "dept": "000050 - 2520 PM - Prod Dev QA", "salary": 75000, "reports_to": "Yehu Woldeamanuel"}, "Ann Marryshow": {"title": "CMIII - Client Manager III", "dept": "000016 - 4200 SS - Tech - CSR", "salary": 75000, "reports_to": "Buscaglia,Richard"}, "Rudy Micallef": {"title": "OPERMNGR - Operations Manager", "dept": "000011 - 3500 PM - OPS - Management", "salary": 75000, "reports_to": "Ardis Sr.,Christopher"}, "Paula Moreira": {"title": "CSMI - Customer Success Manager I", "dept": "000007 - 4425 PM - Sales - Outside", "salary": 75000, "reports_to": "Gretchen Renaud"}, "Gregory Nester": {"title": "VPSALES - VP, Sales", "dept": "000007 - 4425 PM - Sales - Outside", "salary": 75000, "reports_to": "Keith Reilly"}, "Jafet Ojeda": {"title": "QSE - Quadient Software Engineer", "dept": "000052 - 2540 PM - Proj Dev", "salary": 75000, "reports_to": "Vimal Roy"}, "James Oursler": {"title": "BAIII - Business Analyst III", "dept": "000051 - 2530 PM - Proj Del", "salary": 75000, "reports_to": "John Galantine"}, "Yash Patel": {"title": "BAII - Business Analyst II", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "John Galantine"}, "Jason Pinho": {"title": "SOFTENGN - Software Engineer", "dept": "000048 - 2350 OS - Support", "salary": 75000, "reports_to": "Bill Barber"}, "Jon Price": {"title": "SSEII - Senior Software Engineer II", "dept": "000044 - 2310 OS - Prod Dev", "salary": 75000, "reports_to": "Suzanne Deasley"}, "Abishai Rajan": {"title": "SOEADF - Senior Operations Engineer - ADF", "dept": "000053 - 2550 PM - Support", "salary": 75000, "reports_to": "Vimal Roy"}, "Marina Reid": {"title": "BAII - Business Analyst II", "dept": "000051 - 2530 PM - Proj Del", "salary": 75000, "reports_to": "John Galantine"}, "Keith Reilly": {"title": "PRES - President", "dept": "000024 - 1300 SS - G&A - Exec Mgmt", "salary": 75000, "reports_to": ""}, "David Reilly": {"title": "VPTO - VP, Technology & Operations", "dept": "000024 - 1300 SS - G&A - Exec Mgmt", "salary": 75000, "reports_to": "Keith Reilly"}, "Brian Reilly": {"title": "VPMDMS - VP, Marketing and Digital Marketing Services", "dept": "000024 - 1300 SS - G&A - Exec Mgmt", "salary": 75000, "reports_to": "Keith Reilly"}, "Gretchen Renaud": {"title": "VPCSSP - VP, Customer Success & Strategic Partnerships", "dept": "000055 - 4435 PM - Strategic Partnerships", "salary": 75000, "reports_to": "Keith Reilly"}, "Mark Renzi": {"title": "SSEII - Senior Software Engineer II", "dept": "000044 - 2310 OS - Prod Dev", "salary": 75000, "reports_to": "Suzanne Deasley"}, "Jamal Richardson": {"title": "PRODSUPE - Production Supervisor", "dept": "000012 - 3400 PM - OPS - Insert", "salary": 75000, "reports_to": "Dane,Amanda"}, "Vimal Roy": {"title": "DTO - Director of Technology Operations", "dept": "000052 - 2540 PM - Proj Dev", "salary": 75000, "reports_to": "David Reilly"}, "Jenson Samuel": {"title": "ATE - Automation Test Engineer", "dept": "000045 - 2320 OS - Prod Dev QA", "salary": 75000, "reports_to": "Paul Hascek"}, "Shakirah Schlenker": {"title": "ITPM - IT Project Manager", "dept": "000051 - 2530 PM - Proj Del", "salary": 75000, "reports_to": "Eaton,Rebecca L"}, "Joe Scholl": {"title": "QSE - Quadient Software Engineer", "dept": "000044 - 2310 OS - Prod Dev", "salary": 75000, "reports_to": "Vimal Roy"}, "Chris Short": {"title": "SSEII - Senior Software Engineer II", "dept": "000044 - 2310 OS - Prod Dev", "salary": 75000, "reports_to": "Suzanne Deasley"}, "John Smirga": {"title": "PPPA - Print Production & Purchasing Associate", "dept": "000006 - 4500 MS - Marketing Services", "salary": 75000, "reports_to": "Ardis Sr.,Christopher"}, "Peter Steen": {"title": "SRSOE - Senior Systems Operations Engineer", "dept": "000053 - 2550 PM - Support", "salary": 75000, "reports_to": "Bill Barber"}, "Nicole Stewart": {"title": "MRKCOORD - Marketing Coordinator", "dept": "000005 - 4550 PM - Marketing", "salary": 75000, "reports_to": "Brian Reilly"}, "Roopa Teradal": {"title": "LSUPE - Lead Support Engineer", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "Suzanne Deasley"}, "David Thoma": {"title": "SRM - Systems Reliability Manager", "dept": "000031 - 4250 SS - Tech - Integration", "salary": 75000, "reports_to": "Vimal Roy"}, "Jim Toohey": {"title": "VPFA - VP, Finance & Administration", "dept": "000024 - 1300 SS - G&A - Exec Mgmt", "salary": 75000, "reports_to": "Keith Reilly"}, "Rebecca Van Dyke": {"title": "DCS - Director of Client Services", "dept": "000051 - 2530 PM - Proj Del", "salary": 75000, "reports_to": "David Reilly"}, "Chitra Vasanth": {"title": "OSM - Online Services Manager", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "Paul Hascek"}, "Navya Venigalla": {"title": "QABASDET - QA Business Analyst - SDET", "dept": "000045 - 2320 OS - Prod Dev QA", "salary": 75000, "reports_to": "Paul Hascek"}, "Nisha Verghese": {"title": "SES - Software Engineering Supervisor", "dept": "000044 - 2310 OS - Prod Dev", "salary": 75000, "reports_to": "Suzanne Deasley"}, "Yehu Woldeamanuel": {"title": "SES - Software Engineering Supervisor", "dept": "000049 - 2510 PM -  Prod Dev", "salary": 75000, "reports_to": "David Reilly"}, "Linda Woolbert": {"title": "TDM - Technical Delivery Manager III", "dept": "000046 - 2330 OS - Proj Del", "salary": 75000, "reports_to": "Bill Barber"}, "Patricia Zitkus": {"title": "PROJMGR - Project Manager", "dept": "000051 - 2530 PM - Proj Del", "salary": 75000, "reports_to": "Eaton,Rebecca L"}, "Mario Cardenas": {"title": "", "dept": "", "salary": 75000, "reports_to": ""}, "Ashitha Kunhiraman": {"title": "", "dept": "", "salary": 75000, "reports_to": ""}, "David Leung": {"title": "", "dept": "", "salary": 75000, "reports_to": ""}, "Daniel Martin": {"title": "", "dept": "", "salary": 75000, "reports_to": ""}, "Rick Rivera": {"title": "", "dept": "", "salary": 75000, "reports_to": ""}};
+
+
+let loggedInManager = null;
+let msalInstance = null;
+
+const msalConfig = {
+  auth: {
+    clientId: '5742bf9e-9f19-4b51-9209-d02bf55073ec',
+    authority: 'https://login.microsoftonline.com/df31d48e-3ce1-44c0-8022-f1efe44bbba6',
+    redirectUri: window.location.protocol === 'file:' ? 'http://localhost:8765' : window.location.origin
+  },
+  cache: {
+    cacheLocation: 'sessionStorage',
+    storeAuthStateInCookie: false
+  }
+};
+
+let selectedEmployee = null;
+let currentPeriod = null;
+let coreJobEligible = null;
+let coreValueScores = {};
+let cjrScore = 0;
+let cvConsolidatedScore = 0;
+function initPage() {
+  fetch('/api/scorecard').then(function(r) { return r.json(); }).then(function(data) {
+    EMPLOYEES = data.employees || EMPLOYEES;
+    PERF_DATA = data.perfData || PERF_DATA;
+    console.log('Refreshed ' + EMPLOYEES.length + ' employees from server');
+  }).catch(function() {
+    console.log('Using embedded data (' + EMPLOYEES.length + ' employees)');
+  }).finally(function() {
+    initMsal();
+  });
+}
+
+function initMsal() {
+  msalInstance = new msal.PublicClientApplication(msalConfig);
+  msalInstance.handleRedirectPromise().then(function(response) {
+    if (response) {
+      handleMsalResponse(response);
+    } else {
+      var accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        handleExistingSession(accounts[0]);
+      }
+    }
+  }).catch(function(err) {
+    console.error('MSAL redirect error:', err);
+  });
+}
+
+function msalLogin() {
+  var loginRequest = { scopes: ['openid', 'profile', 'User.Read', 'Files.ReadWrite.All', 'Sites.ReadWrite.All'] };
+  msalInstance.loginPopup(loginRequest).then(function(response) {
+    handleMsalResponse(response);
+  }).catch(function(err) {
+    console.error('Login error:', err);
+    var errEl = document.getElementById('loginError');
+    if (err.errorCode === 'user_cancelled') {
+      errEl.textContent = 'Sign-in was cancelled.';
+    } else {
+      errEl.textContent = 'Sign-in failed. Please try again.';
+    }
+    errEl.style.display = 'block';
+  });
+}
+
+function handleMsalResponse(response) {
+  var account = response.account;
+  var displayName = account.name || '';
+  var email = (account.username || '').toLowerCase();
+  var matchedManager = matchManager(displayName, email);
+
+  if (matchedManager) {
+    loggedInManager = matchedManager;
+    document.getElementById('loginError').style.display = 'none';
+    showMainContent();
+  } else {
+    var errEl = document.getElementById('loginError');
+    errEl.textContent = 'Access denied. ' + displayName + ' is not listed as a manager in the review system.';
+    errEl.style.display = 'block';
+    msalInstance.logout({ account: account });
+  }
+}
+
+function handleExistingSession(account) {
+  var displayName = account.name || '';
+  var email = (account.username || '').toLowerCase();
+  var matchedManager = matchManager(displayName, email);
+
+  if (matchedManager) {
+    loggedInManager = matchedManager;
+    showMainContent();
+  }
+}
+
+function matchManager(displayName, email) {
+  var allManagers = Object.keys(MGR_DATA).concat(['Suzanne Deasley']);
+
+  for (var i = 0; i < allManagers.length; i++) {
+    if (allManagers[i] === displayName) return allManagers[i];
+  }
+
+  var lowerName = displayName.toLowerCase();
+  for (var i = 0; i < allManagers.length; i++) {
+    if (allManagers[i].toLowerCase() === lowerName) return allManagers[i];
+  }
+
+  var emailPrefix = email.split('@')[0].replace(/[._]/g, ' ').toLowerCase();
+  for (var i = 0; i < allManagers.length; i++) {
+    if (allManagers[i].toLowerCase() === emailPrefix) return allManagers[i];
+  }
+
+  var emailParts = email.split('@')[0].split('.');
+  if (emailParts.length >= 2) {
+    var firstLast = emailParts[0] + ' ' + emailParts[emailParts.length - 1];
+    for (var i = 0; i < allManagers.length; i++) {
+      if (allManagers[i].toLowerCase() === firstLast.toLowerCase()) return allManagers[i];
+    }
+  }
+
+  return null;
+}
+
+function msalLogout() {
+  loggedInManager = null;
+  coreJobEligible = null;
+  selectedEmployee = null;
+  var accounts = msalInstance.getAllAccounts();
+  if (accounts.length > 0) {
+    msalInstance.logoutPopup({ account: accounts[0] }).then(function() {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('mainContent').classList.add('hidden');
+      document.getElementById('managerDisplay').style.display = 'none';
+      document.getElementById('btnSwitch').style.display = 'none';
+    }).catch(function() {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('mainContent').classList.add('hidden');
+    });
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('mainContent').classList.add('hidden');
+  }
+}
+
+
+function showMainContent() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainContent').classList.remove('hidden');
+  document.getElementById('managerDisplay').textContent = loggedInManager;
+  document.getElementById('managerDisplay').style.display = 'inline';
+  document.getElementById('btnHome').style.display = 'inline-block';
+  document.getElementById('btnSwitch').style.display = 'inline-block';
+  if (loggedInManager === 'Keith Reilly') {
+    window._adminViewAll = true;
+  }
+  initializeReviewForm();
+}
+
+function initializeReviewForm() {
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  const period = (month < 6) ? '1H' + year : '2H' + year;
+  currentPeriod = period;
+
+  loadPeriods();
+  populateEmployeeDropdown();
+  buildTeamRoster();
+  loadCompletedReviews();
+}
+
+function loadPeriods() {
+  const periods = [];
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  const currentPeriod = (month < 6) ? '1H' + year : '2H' + year;
+  
+  periods.push({ key: currentPeriod, isCurrent: true });
+  
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('pmDraft_'));
+  const periodSet = new Set();
+  keys.forEach(k => {
+    const parts = k.split('_');
+    const period = parts[parts.length - 1];
+    if (period !== currentPeriod) {
+      periodSet.add(period);
+    }
+  });
+  
+  periodSet.forEach(p => {
+    periods.push({ key: p, isCurrent: false });
+  });
+  
+  const selector = document.getElementById('periodSelector');
+  selector.innerHTML = '';
+  periods.forEach(p => {
+    const badge = document.createElement('button');
+    badge.className = 'period-badge ' + (p.isCurrent ? 'current' : 'past');
+    badge.textContent = p.key;
+    badge.onclick = () => selectPeriod(p.key, p.isCurrent);
+    selector.appendChild(badge);
+  });
+}
+
+function selectPeriod(period, isCurrent) {
+  currentPeriod = period;
+  const isReadOnly = !isCurrent;
+  document.getElementById('readOnlyBanner').classList.toggle('visible', isReadOnly);
+  
+  const inputs = document.querySelectorAll('input, textarea, select');
+  inputs.forEach(inp => {
+    if (!inp.id.startsWith('emp') && !inp.id.startsWith('doc')) {
+      inp.disabled = isReadOnly;
+    }
+  });
+  
+  const buttons = document.querySelectorAll('.gate-btn, .score-btn');
+  buttons.forEach(btn => {
+    btn.disabled = isReadOnly;
+  });
+  
+  document.getElementById('actionButtons').classList.toggle('hidden', isReadOnly);
+}
+
+function buildTeamRoster() {
+  var container = document.getElementById('teamRosterContent');
+  var rosterDiv = document.getElementById('teamRoster');
+  if (!container || !rosterDiv) return;
+
+  let empList = [];
+  const viewAll = document.getElementById('viewAllCheckbox')?.checked || false;
+  if (viewAll || loggedInManager === 'Keith Reilly') {
+    empList = EMPLOYEES.map(e => e.name);
+  } else {
+    empList = MGR_DATA[loggedInManager] || [];
+  }
+  empList.sort();
+
+  if (empList.length === 0) { rosterDiv.style.display = 'none'; return; }
+
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+  html += '<thead><tr style="background:var(--light);"><th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--primary);">Employee</th><th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--primary);">Title</th><th style="padding:8px 12px;text-align:center;font-weight:600;color:var(--primary);">Status</th><th style="padding:8px 12px;text-align:center;font-weight:600;color:var(--primary);">Action</th></tr></thead><tbody>';
+
+  empList.forEach(function(name) {
+    var census = CENSUS_DATA[name] || {};
+    var draftKey = 'pmDraft_' + name + '_' + currentPeriod;
+    var draft = localStorage.getItem(draftKey);
+    var status = '';
+    var statusStyle = '';
+    if (draft) {
+      var d = JSON.parse(draft);
+      if (d.cvScore > 0 || d.cjrScore > 0) {
+        status = 'In Progress';
+        statusStyle = 'background:#FFF3E0;color:#E65100;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;';
+      } else {
+        status = 'Draft';
+        statusStyle = 'background:#E3F2FD;color:#1565C0;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;';
+      }
+    } else {
+      status = 'Not Started';
+      statusStyle = 'background:#f5f5f5;color:#999;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;';
+    }
+    html += '<tr style="border-bottom:1px solid #eee;">';
+    html += '<td style="padding:8px 12px;font-weight:500;">' + name + '</td>';
+    html += '<td style="padding:8px 12px;color:#666;">' + (census.title || '') + '</td>';
+    html += '<td style="padding:8px 12px;text-align:center;"><span style="' + statusStyle + '">' + status + '</span></td>';
+    html += '<td style="padding:8px 12px;text-align:center;"><a href="#" onclick="event.preventDefault();document.getElementById(\'employeeSelect\').value=\'' + name.replace(/'/g, "\\'") + '\';loadEmployee();window.scrollTo(0,0);" style="color:var(--accent);text-decoration:none;font-weight:600;">Review</a></td>';
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  rosterDiv.style.display = 'block';
+}
+
+function populateEmployeeDropdown() {
+  const select = document.getElementById('employeeSelect');
+  select.innerHTML = '<option value="">-- Select Employee --</option>';
+  
+  let empList = [];
+  const viewAll = document.getElementById('viewAllCheckbox')?.checked || false;
+  
+  if (viewAll || loggedInManager === 'Keith Reilly') {
+    empList = EMPLOYEES.map(e => e.name);
+  } else {
+    empList = MGR_DATA[loggedInManager] || [];
+  }
+  
+  empList.sort().forEach(empName => {
+    const opt = document.createElement('option');
+    opt.value = empName;
+    opt.textContent = empName;
+    select.appendChild(opt);
+  });
+}
+
+function goHome() {
+  document.getElementById('employeeSelect').value = '';
+  loadEmployee();
+  buildTeamRoster();
+}
+
+function loadEmployee() {
+  const empName = document.getElementById('employeeSelect').value;
+  if (!empName) {
+    document.getElementById('employeeInfo').style.display = 'none';
+    document.getElementById('bonusOverviewCard').classList.remove('hidden');
+    // Hide all review sections
+    ['coreJobCard','scoringBandsCard','perfSummaryCard','coreJobCard2','coreValuesCard','bonusCard','managerSummaryCard','completedReviewsCard','actionButtons'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    });
+    return;
+  }
+
+  document.getElementById('bonusOverviewCard').classList.add('hidden');
+  selectedEmployee = empName;
+  const census = CENSUS_DATA[empName] || {};
+  
+  document.getElementById('empName').value = empName;
+  document.getElementById('empTitle').value = census.title || '';
+  document.getElementById('empDept').value = census.dept || '';
+  document.getElementById('employeeInfo').style.display = 'block';
+  
+  loadJobProfile();
+  loadPerformanceData();
+  loadCoreJobSection();
+  loadCoreValuesSection();
+
+  coreJobEligible = null;
+  coreValueScores = {};
+  cjrScore = 0;
+  cvConsolidatedScore = 0;
+
+  document.getElementById('coreJobCard').classList.remove('hidden');
+  document.getElementById('managerSummaryCard').classList.remove('hidden');
+  document.getElementById('scoringBandsCard').classList.remove('hidden');
+  document.getElementById('perfSummaryCard').classList.remove('hidden');
+  document.getElementById('coreJobCard2').classList.remove('hidden');
+  document.getElementById('coreValuesCard').classList.remove('hidden');
+  document.getElementById('bonusCard').classList.remove('hidden');
+  document.getElementById('completedReviewsCard').classList.remove('hidden');
+  document.getElementById('actionButtons').classList.remove('hidden');
+}
+
+function loadPerformanceData() {
+  const perfCard = document.getElementById('perfSummaryCard');
+  if (!selectedEmployee || !PERF_DATA[selectedEmployee]) {
+    perfCard.classList.add('hidden');
+    return;
+  }
+
+  perfCard.classList.remove('hidden');
+  const data = PERF_DATA[selectedEmployee];
+
+  let html = '<div class="perf-card"><h3>Performance Scorecard</h3>';
+
+  // Table
+  var td = 'padding:10px 12px;border-bottom:1px solid #e0e0e0;';
+  var tdc = td + 'text-align:center;';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:14px;font-weight:normal;">';
+  html += '<thead><tr style="background:var(--primary);color:#fff;text-align:left;">';
+  html += '<th style="padding:10px 12px;font-weight:600;">Category</th>';
+  html += '<th style="padding:10px 12px;font-weight:600;">Measure</th>';
+  html += '<th style="padding:10px 12px;text-align:center;font-weight:600;">Result</th>';
+  html += '<th style="padding:10px 12px;text-align:center;font-weight:600;">Score (0-3)</th>';
+  html += '<th style="padding:10px 12px;text-align:center;font-weight:600;">Multiplier</th>';
+  html += '<th style="padding:10px 12px;text-align:center;font-weight:600;">Points</th>';
+  html += '</tr></thead><tbody>';
+
+  // WIG row
+  let runningPts = 0;
+  let runningMax = 0;
+  const wigMultiplier = 2;
+  html += '<tr>';
+  html += '<td style="' + td + '">WIG</td>';
+  html += '<td style="' + td + '">' + escapeHtml(data.wigName) + '</td>';
+  html += '<td style="' + tdc + '">' + (data.wigPct || 0) + '%</td>';
+  html += '<td style="' + tdc + '">' + (data.wigScore || 0) + '</td>';
+  html += '<td style="' + tdc + '">&times;' + wigMultiplier + '</td>';
+  html += '<td style="' + tdc + '">' + data.wigPts + '</td>';
+  html += '</tr>';
+  runningPts += data.wigPts;
+  runningMax += 3 * wigMultiplier;
+
+  // Lead rows - disambiguate duplicate names
+  var leadDisplayNames = [];
+  if (data.leads && data.leads.length > 0) {
+    var nameCounts = {};
+    data.leads.forEach(function(l) { nameCounts[l.n] = (nameCounts[l.n] || 0) + 1; });
+    var nameSeq = {};
+    leadDisplayNames = data.leads.map(function(l) {
+      if (nameCounts[l.n] > 1) {
+        nameSeq[l.n] = (nameSeq[l.n] || 0) + 1;
+        return l.n + ' (' + nameSeq[l.n] + ')';
+      }
+      return l.n;
+    });
+    data.leads.forEach((lead, i) => {
+      html += '<tr>';
+      html += '<td style="' + td + '">Lead Measure</td>';
+      html += '<td style="' + td + '">' + escapeHtml(leadDisplayNames[i]) + '</td>';
+      html += '<td style="' + tdc + '">' + (lead.p !== null ? lead.p + '%' : 'N/A') + '</td>';
+      html += '<td style="' + tdc + '">' + (lead.s || 0) + '</td>';
+      html += '<td style="' + tdc + '">&times;1</td>';
+      html += '<td style="' + tdc + '">' + (lead.s || 0) + '</td>';
+      html += '</tr>';
+      runningPts += (lead.s || 0);
+      runningMax += 3;
+    });
+  }
+
+  // Recalculate totals without XPS
+  var kpiPts = runningPts;
+  var kpiMax = runningMax;
+  var kpiPct = kpiMax > 0 ? ((kpiPts / kpiMax) * 100).toFixed(1) : '0.0';
+
+  // Normalize to 15-point scale for display
+  var kpi15Display = kpiMax > 0 ? Math.round((kpiPts / kpiMax) * 15) : 0;
+
+  // Totals row
+  html += '<tr style="background:var(--primary);color:#fff;">';
+  html += '<td style="padding:12px;font-weight:600;" colspan="5">4DX Total</td>';
+  html += '<td style="padding:12px;text-align:center;">' + kpi15Display + ' / 15</td>';
+  html += '</tr>';
+  html += '</tbody></table>';
+
+  // Breakdown explanation
+  html += '<div style="margin-top:14px;padding:14px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:13px;line-height:1.8;color:#555;">';
+  html += '<strong style="color:var(--primary);">How Points Are Calculated:</strong><br>';
+  html += 'WIG: Score ' + (data.wigScore||0) + ' × 2 (multiplier) = <b>' + data.wigPts + ' pts</b>';
+  if (data.leads && data.leads.length > 0) {
+    data.leads.forEach((lead, i) => {
+      var dn = leadDisplayNames.length > i ? leadDisplayNames[i] : lead.n;
+      html += '<br>' + escapeHtml(dn) + ': Score ' + (lead.s||0) + ' × 1 = <b>' + (lead.s||0) + ' pts</b>';
+    });
+  }
+  html += '<br><span style="border-top:1px solid #ccc;display:inline-block;margin-top:6px;padding-top:6px;"><b>4DX Total: ' + kpi15Display + ' / 15</b></span>';
+  html += '</div>';
+
+  html += '<div class="perf-overall">';
+  html += '<div class="perf-overall-label">4DX Score: ' + kpi15Display + ' / 15</div>';
+  html += '</div>';
+  html += '</div>';
+  
+  document.getElementById('perfSummaryContent').innerHTML = html;
+}
+
+function getBandLabel(score) {
+  const labels = { 0: 'Failure', 1: 'Under Achv', 2: 'Good Job', 3: 'Over Achv' };
+  return labels[score] || 'Unknown';
+}
+
+function getXPSLabel(score) {
+  const labels = { 0: 'Failure', 1: 'Under Achv', 2: 'Good Job', 3: 'Over Achv' };
+  return labels[score] || 'Unknown';
+}
+
+const CV_NAMES = ['We Are Customer Focused', 'We Value Excellence', 'We Take Ownership', 'We Serve Others', 'We Have Fun'];
+
+const SCORE_LABELS = {
+  0: { label: 'Not Observed', desc: 'Employee has not demonstrated this competency or insufficient information to evaluate.' },
+  1: { label: 'Below Expectations', desc: 'Rarely demonstrates the expected behaviors; significant improvement needed.' },
+  2: { label: 'Needs Improvement', desc: 'Inconsistently demonstrates the expected behaviors; development needed in key areas.' },
+  3: { label: 'Meets Expectations', desc: 'Consistently demonstrates the expected behaviors; reliable and dependable.' },
+  4: { label: 'Exceeds Expectations', desc: 'Frequently goes beyond expectations; a strong contributor and positive influence.' },
+  5: { label: 'Exceptional', desc: 'Role model who consistently exemplifies the highest standards; inspires and elevates others.' }
+};
+
+const CJR_SCORE_LABELS = [
+  {label: 'Not Observed', desc: 'Not enough information to evaluate'},
+  {label: 'Far Below', desc: 'Significantly below minimum standards'},
+  {label: 'Below Expectations', desc: 'Below minimum acceptable standards'},
+  {label: 'Needs Improvement', desc: 'Approaching but not meeting standards'},
+  {label: 'Approaching', desc: 'Close to meeting expectations'},
+  {label: 'Meets Expectations', desc: 'Consistently meets job requirements'},
+  {label: 'Meets+', desc: 'Meets expectations with some areas of strength'},
+  {label: 'Above Expectations', desc: 'Regularly exceeds requirements'},
+  {label: 'Exceeds', desc: 'Consistently exceeds expectations'},
+  {label: 'Outstanding', desc: 'Exceptional performance in most areas'},
+  {label: 'Exceptional', desc: 'Top-tier performance across all areas'}
+];
+
+function buildScoreSelector(sectionId, currentScore, maxScore) {
+  if (!maxScore) maxScore = 5;
+  var labels = sectionId === 'cjr' ? CJR_SCORE_LABELS : SCORE_LABELS;
+  var html = '<div class="score-selector" data-section="' + sectionId + '">';
+  for (var i = 0; i <= maxScore; i++) {
+    var sel = currentScore === i ? ' score-selected' : '';
+    html += '<button class="score-btn-new' + sel + '" data-section="' + sectionId + '" data-score="' + i + '">';
+    html += '<div class="score-btn-num">' + i + '</div>';
+    html += '<div class="score-btn-label">' + labels[i].label + '</div>';
+    html += '</button>';
+  }
+  html += '</div>';
+  if (currentScore >= 0 && labels[currentScore]) {
+    html += '<div class="score-desc" id="' + sectionId + 'Desc">' + labels[currentScore].desc + '</div>';
+  }
+  return html;
+}
+
+function loadCoreJobSection() {
+  var container = document.getElementById('coreJobContent');
+  var html = '<div style="margin-top:8px;">';
+  html += '<label style="font-size:14px;font-weight:600;color:var(--primary);margin-bottom:8px;display:block;">Core Job Performance Score (0-10)</label>';
+  html += buildScoreSelector('cjr', cjrScore, 10);
+  html += '</div>';
+  container.innerHTML = html;
+
+  document.querySelectorAll('.score-btn-new[data-section="cjr"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      selectScore('cjr', parseInt(this.getAttribute('data-score')));
+    });
+  });
+
+  restoreScores();
+}
+
+function loadCoreValuesSection() {
+  var html = '<div style="margin-bottom:12px;font-size:13px;color:#888;">';
+  html += '<strong>Core Values:</strong> ' + CV_NAMES.join(' · ');
+  html += '</div>';
+  html += buildScoreSelector('cv', cvConsolidatedScore);
+  document.getElementById('coreValuesContent').innerHTML = html;
+
+  document.querySelectorAll('.score-btn-new[data-section="cv"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      selectScore('cv', parseInt(this.getAttribute('data-score')));
+    });
+  });
+
+  restoreScores();
+}
+
+function selectScore(sectionId, score) {
+  if (sectionId === 'cjr') cjrScore = score;
+  if (sectionId === 'cv') cvConsolidatedScore = score;
+
+  document.querySelectorAll('.score-btn-new[data-section="' + sectionId + '"]').forEach(function(btn) {
+    btn.classList.remove('score-selected');
+    if (parseInt(btn.getAttribute('data-score')) === score) {
+      btn.classList.add('score-selected');
+    }
+  });
+
+  var labels = sectionId === 'cjr' ? CJR_SCORE_LABELS : SCORE_LABELS;
+  var descEl = document.getElementById(sectionId + 'Desc');
+  if (descEl) descEl.textContent = labels[score].desc;
+  else {
+    var sel = document.querySelector('.score-selector[data-section="' + sectionId + '"]');
+    if (sel) {
+      var d = document.createElement('div');
+      d.className = 'score-desc';
+      d.id = sectionId + 'Desc';
+      d.textContent = labels[score].desc;
+      sel.parentNode.insertBefore(d, sel.nextSibling);
+    }
+  }
+
+  updateSectionTotals();
+  updateBonusCalculation();
+}
+
+function restoreScores() {
+  var stored = localStorage.getItem('pmScores_' + selectedEmployee + '_' + currentPeriod);
+  if (stored) {
+    var scores = JSON.parse(stored);
+    if (scores.cjr !== undefined) { cjrScore = scores.cjr; selectScore('cjr', scores.cjr); }
+    if (scores.cv !== undefined) { cvConsolidatedScore = scores.cv; selectScore('cv', scores.cv); }
+  }
+}
+
+function updateSectionTotals() {
+  var cjrDiv = document.getElementById('cjrTotal');
+  if (cjrScore > 0) {
+    cjrDiv.innerHTML = 'Core Job Responsibilities Score: <strong>' + cjrScore + ' / 10</strong>';
+    cjrDiv.style.display = 'block';
+  } else {
+    cjrDiv.style.display = 'none';
+  }
+
+  var cvDiv = document.getElementById('cvTotal');
+  if (cvConsolidatedScore > 0) {
+    cvDiv.innerHTML = 'Core Values Score: <strong>' + cvConsolidatedScore + ' / 5</strong>';
+    cvDiv.style.display = 'block';
+  } else { cvDiv.style.display = 'none'; }
+}
+
+function selectGate(btn, value) {
+  btn.parentNode.querySelectorAll('.gate-btn').forEach(b => b.classList.remove('selected-yes', 'selected-no'));
+  if (value === 'yes') {
+    btn.classList.add('selected-yes');
+    coreJobEligible = true;
+  } else {
+    btn.classList.add('selected-no');
+    coreJobEligible = false;
+  }
+  
+  const warning = document.getElementById('gateWarning');
+  warning.classList.toggle('visible', value === 'no');
+  
+  updateBonusCalculation();
+}
+
+function updateBonusCalculation() {
+  if (!selectedEmployee || !PERF_DATA[selectedEmployee]) return;
+
+  const census = CENSUS_DATA[selectedEmployee] || {};
+  const perfData = PERF_DATA[selectedEmployee];
+  const salary = census.salary || 0;
+  const bonusRate = 0.10;
+
+  // Recalculate 4DX raw points without XPS
+  var kpiRawPts = perfData.wigPts;
+  var kpiRawMax = 6; // WIG max
+  if (perfData.leads) {
+    perfData.leads.forEach(function(l) { kpiRawPts += (l.s || 0); kpiRawMax += 3; });
+  }
+  // Normalize 4DX to 15-point scale
+  var kpi15 = kpiRawMax > 0 ? Math.round((kpiRawPts / kpiRawMax) * 15 * 10) / 10 : 0;
+
+  const totalPts = kpi15 + cjrScore + cvConsolidatedScore;
+  const maxPts = 30; // 15 + 10 + 5
+  const overallPct = (totalPts / maxPts) * 100;
+
+  const bonusEligible = coreJobEligible;
+  const bonusAmount = bonusEligible ? (salary / 2) * bonusRate * (overallPct / 100) : 0;
+
+  let html = '<div class="bonus-card">';
+  html += '<h4>Bonus Calculation Summary</h4>';
+  html += '<div class="bonus-row"><span class="bonus-label">Annual Salary</span><span class="bonus-value">' + formatCurrency(salary) + '</span></div>';
+  html += '<div class="bonus-row"><span class="bonus-label">Bonus Rate</span><span class="bonus-value">' + (bonusRate * 100) + '%</span></div>';
+  html += '<div class="bonus-row"><span class="bonus-label">4DX Performance (normalized)</span><span class="bonus-value">' + kpi15.toFixed(1) + ' / 15</span></div>';
+  html += '<div class="bonus-row"><span class="bonus-label">Core Job Responsibilities</span><span class="bonus-value">' + cjrScore + ' / 10</span></div>';
+  html += '<div class="bonus-row"><span class="bonus-label">Core Values</span><span class="bonus-value">' + cvConsolidatedScore + ' / 5</span></div>';
+  html += '<div class="bonus-row"><span class="bonus-label">Overall Performance</span><span class="bonus-value">' + totalPts.toFixed(1) + ' / ' + maxPts + ' (' + overallPct.toFixed(1) + '%)</span></div>';
+  html += '<div class="bonus-row"><span class="bonus-label">Eligibility Status</span><span class="bonus-value" style="' + (bonusEligible ? 'color: var(--green);' : 'color: var(--red);') + '">' + (bonusEligible ? 'Eligible' : 'Not Eligible') + '</span></div>';
+  html += '<div class="bonus-row" style="border-top: 2px solid #4a90e2; margin-top: 12px; padding-top: 12px;"><span class="bonus-label" style="font-size: 16px;">Bonus Amount</span><span class="bonus-amount">' + formatCurrency(bonusAmount) + '</span></div>';
+  html += '</div>';
+
+  document.getElementById('bonusContent').innerHTML = html;
+}
+
+function toggleSection(headerEl) {
+  const content = headerEl.nextElementSibling;
+  const arrow = headerEl.querySelector('.arrow');
+  
+  content.classList.toggle('visible');
+  arrow.classList.toggle('collapsed');
+  arrow.classList.toggle('expanded');
+}
+
+function formatCurrency(val) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(val);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+function saveDraft() {
+  if (!selectedEmployee) {
+    alert('Please select an employee');
+    return;
+  }
+  
+  saveJobProfile();
+
+  const draft = {
+    employee: selectedEmployee,
+    period: currentPeriod,
+    eligible: coreJobEligible,
+    whatGoing: document.getElementById('whatGoing').value,
+    needsImprovement: document.getElementById('needsImprovement').value,
+    cjrScore: cjrScore,
+    kpi1: document.getElementById('kpi1Display') ? document.getElementById('kpi1Display').textContent : '',
+    kpi2: document.getElementById('kpi2Display') ? document.getElementById('kpi2Display').textContent : '',
+    kpi3: document.getElementById('kpi3Display') ? document.getElementById('kpi3Display').textContent : '',
+    cvScore: cvConsolidatedScore,
+    timestamp: new Date().toISOString()
+  };
+
+  const key = 'pmDraft_' + selectedEmployee + '_' + currentPeriod;
+  localStorage.setItem(key, JSON.stringify(draft));
+  localStorage.setItem('pmScores_' + selectedEmployee + '_' + currentPeriod, JSON.stringify({ cjr: cjrScore, cv: cvConsolidatedScore }));
+
+  alert('Review draft saved for ' + selectedEmployee);
+  buildTeamRoster();
+}
+
+function generateDocument() {
+  if (!selectedEmployee) {
+    alert('Please select an employee');
+    return;
+  }
+
+  const census = CENSUS_DATA[selectedEmployee] || {};
+  const perfData = PERF_DATA[selectedEmployee];
+  const salary = census.salary || 0;
+  const bonusRate = 0.10;
+  // Recalculate 4DX raw points without XPS
+  var pdfKpiRawPts = 0, pdfKpiRawMax = 0;
+  if (perfData) {
+    pdfKpiRawPts = perfData.wigPts;
+    pdfKpiRawMax = 6;
+    if (perfData.leads) { perfData.leads.forEach(function(l) { pdfKpiRawPts += (l.s||0); pdfKpiRawMax += 3; }); }
+  }
+  // Normalize 4DX to 15-point scale
+  var pdfKpi15 = pdfKpiRawMax > 0 ? Math.round((pdfKpiRawPts / pdfKpiRawMax) * 15 * 10) / 10 : 0;
+  const totalPts = pdfKpi15 + cjrScore + cvConsolidatedScore;
+  const maxPts = 30;
+  const overallPct = (totalPts / maxPts) * 100;
+  const bonusAmount = coreJobEligible ? (salary / 2) * bonusRate * (overallPct / 100) : 0;
+  const whatGoing = document.getElementById('whatGoing').value || '';
+  const needsImprovement = document.getElementById('needsImprovement').value || '';
+
+  // Build lead display names for PDF
+  var pdfLeadNames = [];
+  if (perfData && perfData.leads) {
+    var nc = {};
+    perfData.leads.forEach(function(l) { nc[l.n] = (nc[l.n] || 0) + 1; });
+    var ns = {};
+    pdfLeadNames = perfData.leads.map(function(l) {
+      if (nc[l.n] > 1) { ns[l.n] = (ns[l.n] || 0) + 1; return l.n + ' (' + ns[l.n] + ')'; }
+      return l.n;
+    });
+  }
+
+  // Performance table rows
+  var perfRows = '';
+  if (perfData) {
+    perfRows += '<tr><td style="padding:8px 10px;border:1px solid #ccc;">WIG</td>';
+    perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;">' + escapeHtml(perfData.wigName) + '</td>';
+    perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">' + (perfData.wigPct || 0) + '%</td>';
+    perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">' + (perfData.wigScore || 0) + '</td>';
+    perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">&times;2</td>';
+    perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">' + perfData.wigPts + '</td></tr>';
+    if (perfData.leads) {
+      perfData.leads.forEach(function(lead, i) {
+        perfRows += '<tr><td style="padding:8px 10px;border:1px solid #ccc;">Lead Measure</td>';
+        perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;">' + escapeHtml(pdfLeadNames[i]) + '</td>';
+        perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">' + (lead.p !== null ? lead.p + '%' : 'N/A') + '</td>';
+        perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">' + (lead.s || 0) + '</td>';
+        perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">&times;1</td>';
+        perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">' + (lead.s || 0) + '</td></tr>';
+      });
+    }
+    var pdfKpi15Display = pdfKpiMax > 0 ? Math.round((pdfKpiPts / pdfKpiMax) * 15) : 0;
+    perfRows += '<tr style="background:#1F4E79;color:#fff;font-weight:600;"><td style="padding:8px 10px;border:1px solid #ccc;" colspan="5">4DX Total</td>';
+    perfRows += '<td style="padding:8px 10px;border:1px solid #ccc;text-align:center;">' + pdfKpi15Display + ' / 15</td></tr>';
+  }
+
+
+  // Build full HTML for PDF
+  var pdfHtml = '<div id="pdfContent" style="width:800px;padding:40px;font-family:Segoe UI,Arial,sans-serif;color:#333;background:#fff;">';
+
+  // Header
+  pdfHtml += '<div style="text-align:center;border-bottom:3px solid #1F4E79;padding-bottom:16px;margin-bottom:24px;">';
+  pdfHtml += '<h1 style="color:#1F4E79;font-size:22px;margin:0 0 4px 0;">PrintMail Solutions</h1>';
+  pdfHtml += '<h2 style="color:#444;font-size:18px;margin:0 0 4px 0;font-weight:400;">Employee Performance Review</h2>';
+  pdfHtml += '<p style="color:#888;font-size:13px;margin:0;">' + currentPeriod + '</p>';
+  pdfHtml += '</div>';
+
+  // Employee Info
+  pdfHtml += '<div style="margin-bottom:20px;">';
+  pdfHtml += '<h3 style="color:#1F4E79;font-size:15px;border-bottom:1px solid #ddd;padding-bottom:6px;margin:0 0 12px 0;">Employee Information</h3>';
+  pdfHtml += '<table style="width:100%;font-size:14px;"><tr>';
+  pdfHtml += '<td style="padding:4px 0;width:50%;"><strong style="color:#888;">Name:</strong> ' + escapeHtml(selectedEmployee) + '</td>';
+  pdfHtml += '<td style="padding:4px 0;"><strong style="color:#888;">Title:</strong> ' + escapeHtml(census.title || '') + '</td>';
+  pdfHtml += '</tr><tr>';
+  pdfHtml += '<td style="padding:4px 0;"><strong style="color:#888;">Department:</strong> ' + escapeHtml(census.dept || '') + '</td>';
+  pdfHtml += '<td style="padding:4px 0;"><strong style="color:#888;">Manager:</strong> ' + escapeHtml(loggedInManager) + '</td>';
+  pdfHtml += '</tr></table></div>';
+
+  // Eligibility
+  pdfHtml += '<div style="margin-bottom:20px;">';
+  pdfHtml += '<h3 style="color:#1F4E79;font-size:15px;border-bottom:1px solid #ddd;padding-bottom:6px;margin:0 0 12px 0;">Core Job Performance</h3>';
+  var eligColor = coreJobEligible ? '#548235' : '#C00000';
+  var eligText = coreJobEligible ? 'Eligible' : 'Not Eligible';
+  pdfHtml += '<p>Eligible for bonus: <strong style="color:' + eligColor + ';">' + eligText + '</strong></p>';
+  pdfHtml += '</div>';
+
+  // Manager Summary
+  pdfHtml += '<div style="margin-bottom:20px;">';
+  pdfHtml += '<h3 style="color:#1F4E79;font-size:15px;border-bottom:1px solid #ddd;padding-bottom:6px;margin:0 0 12px 0;">Manager Summary</h3>';
+  pdfHtml += '<p style="font-size:14px;margin:0 0 4px;"><strong>What is going well:</strong></p>';
+  pdfHtml += '<div style="background:#f5f7fa;border:1px solid #ddd;border-radius:4px;padding:12px;font-size:13px;min-height:40px;white-space:pre-wrap;margin-bottom:12px;">' + escapeHtml(whatGoing) + '</div>';
+  pdfHtml += '<p style="font-size:14px;margin:0 0 4px;"><strong>What needs improvement:</strong></p>';
+  pdfHtml += '<div style="background:#f5f7fa;border:1px solid #ddd;border-radius:4px;padding:12px;font-size:13px;min-height:40px;white-space:pre-wrap;">' + escapeHtml(needsImprovement) + '</div>';
+  pdfHtml += '</div>';
+
+  // Scoring Reference
+  pdfHtml += '<div style="margin-bottom:20px;">';
+  pdfHtml += '<h3 style="color:#1F4E79;font-size:15px;border-bottom:1px solid #ddd;padding-bottom:6px;margin:0 0 12px 0;">Scoring Reference</h3>';
+  pdfHtml += '<div style="display:flex;gap:16px;">';
+  // WIG/Lead bands
+  pdfHtml += '<div style="flex:1;background:#f5f7fa;border-radius:6px;padding:12px;">';
+  pdfHtml += '<div style="font-weight:600;color:#1F4E79;margin-bottom:8px;font-size:13px;">WIG/Lead Measure Scoring Bands</div>';
+  pdfHtml += '<table style="width:100%;font-size:12px;border-collapse:collapse;">';
+  pdfHtml += '<tr><td style="padding:4px 6px;border-bottom:1px solid #ddd;">Failure</td><td style="padding:4px 6px;border-bottom:1px solid #ddd;">Below 80%</td><td style="padding:4px 6px;border-bottom:1px solid #ddd;">0 pts</td></tr>';
+  pdfHtml += '<tr><td style="padding:4px 6px;border-bottom:1px solid #ddd;">Under Achievement</td><td style="padding:4px 6px;border-bottom:1px solid #ddd;">80% &ndash; 89.9%</td><td style="padding:4px 6px;border-bottom:1px solid #ddd;">1 pt</td></tr>';
+  pdfHtml += '<tr><td style="padding:4px 6px;border-bottom:1px solid #ddd;">Good Job</td><td style="padding:4px 6px;border-bottom:1px solid #ddd;">90% &ndash; 105%</td><td style="padding:4px 6px;border-bottom:1px solid #ddd;">2 pts</td></tr>';
+  pdfHtml += '<tr><td style="padding:4px 6px;">Over Achievement</td><td style="padding:4px 6px;">Above 105%</td><td style="padding:4px 6px;">3 pts</td></tr>';
+  pdfHtml += '</table></div>';
+  // Qualitative scoring bands
+  pdfHtml += '<div style="flex:1;background:#f5f7fa;border-radius:6px;padding:12px;">';
+  pdfHtml += '<div style="font-weight:600;color:#1F4E79;margin-bottom:8px;font-size:13px;">Section Weights</div>';
+  pdfHtml += '<table style="width:100%;font-size:12px;border-collapse:collapse;">';
+  pdfHtml += '<tr><td style="padding:3px 6px;border-bottom:1px solid #ddd;font-weight:600;">4DX Performance</td><td style="padding:3px 6px;border-bottom:1px solid #ddd;">15 pts (normalized)</td></tr>';
+  pdfHtml += '<tr><td style="padding:3px 6px;border-bottom:1px solid #ddd;font-weight:600;">Core Job Responsibilities</td><td style="padding:3px 6px;border-bottom:1px solid #ddd;">10 pts (0-10)</td></tr>';
+  pdfHtml += '<tr><td style="padding:3px 6px;border-bottom:1px solid #ddd;font-weight:600;">Core Values</td><td style="padding:3px 6px;border-bottom:1px solid #ddd;">5 pts (0-5)</td></tr>';
+  pdfHtml += '<tr style="background:#1F4E79;color:#fff;"><td style="padding:3px 6px;font-weight:600;">Total</td><td style="padding:3px 6px;font-weight:600;">30 pts</td></tr>';
+  pdfHtml += '</table></div>';
+  pdfHtml += '</div>';
+  pdfHtml += '<p style="margin-top:8px;font-size:11px;color:#888;">WIG scores receive a <b>&times;2 multiplier</b>. Lead measures receive a <b>&times;1 multiplier</b>.</p>';
+  pdfHtml += '</div>';
+
+  // 4DX Performance
+  pdfHtml += '<div style="margin-bottom:20px;">';
+  pdfHtml += '<h3 style="color:#1F4E79;font-size:15px;border-bottom:1px solid #ddd;padding-bottom:6px;margin:0 0 12px 0;">4DX Performance Summary</h3>';
+  pdfHtml += '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+  pdfHtml += '<thead><tr style="background:#1F4E79;color:#fff;"><th style="padding:8px 10px;border:1px solid #ccc;text-align:left;">Category</th><th style="padding:8px 10px;border:1px solid #ccc;text-align:left;">Measure</th><th style="padding:8px 10px;border:1px solid #ccc;text-align:center;">Result</th><th style="padding:8px 10px;border:1px solid #ccc;text-align:center;">Score</th><th style="padding:8px 10px;border:1px solid #ccc;text-align:center;">Mult.</th><th style="padding:8px 10px;border:1px solid #ccc;text-align:center;">Points</th></tr></thead>';
+  pdfHtml += '<tbody>' + perfRows + '</tbody></table>';
+  pdfHtml += '</div>';
+
+  // Core Job Responsibilities
+  pdfHtml += '<div style="margin-bottom:20px;">';
+  pdfHtml += '<h3 style="color:#1F4E79;font-size:15px;border-bottom:1px solid #ddd;padding-bottom:6px;margin:0 0 12px 0;">Core Job Responsibilities</h3>';
+  pdfHtml += '<p style="font-size:14px;">Score: <strong>' + cjrScore + ' / 10</strong> (' + (CJR_SCORE_LABELS[cjrScore] ? CJR_SCORE_LABELS[cjrScore].label : '-') + ')</p>';
+  pdfHtml += '<p style="font-size:12px;color:#666;">' + (CJR_SCORE_LABELS[cjrScore] ? CJR_SCORE_LABELS[cjrScore].desc : '') + '</p>';
+  pdfHtml += '</div>';
+
+  // Core Values (consolidated)
+  pdfHtml += '<div style="margin-bottom:20px;">';
+  pdfHtml += '<h3 style="color:#1F4E79;font-size:15px;border-bottom:1px solid #ddd;padding-bottom:6px;margin:0 0 12px 0;">Core Values Assessment</h3>';
+  pdfHtml += '<p style="font-size:13px;color:#666;margin-bottom:8px;">Values: ' + CV_NAMES.join(' &bull; ') + '</p>';
+  pdfHtml += '<p style="font-size:14px;">Score: <strong>' + cvConsolidatedScore + ' / 5</strong> (' + (SCORE_LABELS[cvConsolidatedScore] ? SCORE_LABELS[cvConsolidatedScore].label : '-') + ')</p>';
+  pdfHtml += '<p style="font-size:12px;color:#666;">' + (SCORE_LABELS[cvConsolidatedScore] ? SCORE_LABELS[cvConsolidatedScore].desc : '') + '</p>';
+  pdfHtml += '</div>';
+
+  // Bonus Calculation
+  pdfHtml += '<div style="margin-bottom:20px;">';
+  pdfHtml += '<h3 style="color:#1F4E79;font-size:15px;border-bottom:1px solid #ddd;padding-bottom:6px;margin:0 0 12px 0;">Bonus Calculation</h3>';
+  pdfHtml += '<table style="width:100%;font-size:14px;border-collapse:collapse;">';
+  pdfHtml += '<tr><td style="padding:6px 0;">Annual Salary</td><td style="padding:6px 0;text-align:right;font-weight:600;">' + formatCurrency(salary) + '</td></tr>';
+  pdfHtml += '<tr><td style="padding:6px 0;">Bonus Rate</td><td style="padding:6px 0;text-align:right;font-weight:600;">' + (bonusRate * 100) + '%</td></tr>';
+  pdfHtml += '<tr><td style="padding:6px 0;">4DX Performance (normalized)</td><td style="padding:6px 0;text-align:right;font-weight:600;">' + pdfKpi15.toFixed(1) + ' / 15</td></tr>';
+  pdfHtml += '<tr><td style="padding:6px 0;">Core Job Responsibilities</td><td style="padding:6px 0;text-align:right;font-weight:600;">' + cjrScore + ' / 10</td></tr>';
+  pdfHtml += '<tr><td style="padding:6px 0;">Core Values</td><td style="padding:6px 0;text-align:right;font-weight:600;">' + cvConsolidatedScore + ' / 5</td></tr>';
+  pdfHtml += '<tr><td style="padding:6px 0;">Overall Performance</td><td style="padding:6px 0;text-align:right;font-weight:600;">' + totalPts.toFixed(1) + ' / ' + maxPts + ' (' + overallPct.toFixed(1) + '%)</td></tr>';
+  pdfHtml += '<tr><td style="padding:6px 0;">Eligibility</td><td style="padding:6px 0;text-align:right;font-weight:600;color:' + eligColor + ';">' + eligText + '</td></tr>';
+  pdfHtml += '<tr style="border-top:2px solid #1F4E79;"><td style="padding:10px 0;font-size:16px;font-weight:600;">Bonus Amount</td><td style="padding:10px 0;text-align:right;font-size:18px;font-weight:700;color:#548235;">' + formatCurrency(bonusAmount) + '</td></tr>';
+  pdfHtml += '</table>';
+  pdfHtml += '<p style="font-size:12px;color:#888;margin-top:8px;">Formula: (Annual Salary / 2) &times; Bonus % &times; Overall %</p>';
+  pdfHtml += '</div>';
+
+  // Footer
+  pdfHtml += '<div style="margin-top:30px;padding-top:16px;border-top:2px solid #1F4E79;text-align:center;color:#888;font-size:11px;">';
+  pdfHtml += 'PrintMail Solutions &bull; Employee Performance Review &bull; Generated ' + new Date().toLocaleDateString() + '</div>';
+
+  pdfHtml += '</div>';
+
+  // Create offscreen container, render to canvas, then PDF
+  var container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.background = '#fff';
+  container.innerHTML = pdfHtml;
+  document.body.appendChild(container);
+
+  var pdfEl = container.querySelector('#pdfContent');
+  var btn = document.querySelector('[onclick="generateDocument()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating PDF...'; }
+
+  html2canvas(pdfEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(function(canvas) {
+    var imgData = canvas.toDataURL('image/png');
+    var pdf = new jspdf.jsPDF('p', 'mm', 'letter');
+    var pageW = pdf.internal.pageSize.getWidth();
+    var pageH = pdf.internal.pageSize.getHeight();
+    var margin = 10;
+    var contentW = pageW - (margin * 2);
+    var imgH = (canvas.height * contentW) / canvas.width;
+
+    var yPos = 0;
+    var remainH = imgH;
+
+    while (remainH > 0) {
+      if (yPos > 0) pdf.addPage();
+      var sliceH = Math.min(remainH, pageH - (margin * 2));
+      var srcY = yPos * (canvas.height / imgH);
+      var srcH = sliceH * (canvas.height / imgH);
+
+      var sliceCanvas = document.createElement('canvas');
+      sliceCanvas.width = canvas.width;
+      sliceCanvas.height = srcH;
+      var ctx = sliceCanvas.getContext('2d');
+      ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+
+      var sliceImg = sliceCanvas.toDataURL('image/png');
+      pdf.addImage(sliceImg, 'PNG', margin, margin, contentW, sliceH);
+
+      yPos += sliceH;
+      remainH -= sliceH;
+    }
+
+    var filename = selectedEmployee.replace(/\s+/g, '_') + '_Review_' + currentPeriod.replace(/\s+/g, '_') + '.pdf';
+    pdf.save(filename);
+
+    document.body.removeChild(container);
+    if (btn) { btn.disabled = false; btn.textContent = 'Generate Review Document'; }
+  }).catch(function(err) {
+    console.error('PDF generation failed:', err);
+    alert('PDF generation failed. Please try again.');
+    document.body.removeChild(container);
+    if (btn) { btn.disabled = false; btn.textContent = 'Generate Review Document'; }
+  });
+}
+
+// ── SharePoint Graph API Integration ──
+var SP_CONFIG = {
+  siteHost: 'printmailsolutions.sharepoint.com',
+  sitePath: '/sites/PrintMailSolutions',
+  fileId: '8F3C0EB2-9462-4E7B-AFFC-69E842B10EE3',
+  sheet: 'Sheet1'
+};
+
+var REVIEW_HEADERS = [
+  "Review Period","Submitted By","Submitted Date","Employee","Title","Department",
+  "Eligible","What Is Going Well","What Needs Improvement",
+  "WIG Name","WIG Result %","WIG Score","WIG Points",
+  "Lead 1 Name","Lead 1 Result %","Lead 1 Score",
+  "Lead 2 Name","Lead 2 Result %","Lead 2 Score",
+  "Lead 3 Name","Lead 3 Result %","Lead 3 Score",
+  "Lead 4 Name","Lead 4 Result %","Lead 4 Score",
+  "4DX Total Pts","4DX Max Pts","4DX %","Performance Level",
+  "KPI 1","KPI 2","KPI 3",
+  "CJR Score","CJR Label","Core Values Score","Core Values Label",
+  "Overall Pts","Overall Max Pts","Overall %",
+  "Annual Salary","Bonus Rate","Bonus Amount"
+];
+
+var CJR_LABELS = {0:"Not Observed",1:"Far Below",2:"Below Expectations",3:"Needs Improvement",4:"Approaching",5:"Meets Expectations",6:"Meets+",7:"Above Expectations",8:"Exceeds",9:"Outstanding",10:"Exceptional"};
+var CV_LABELS = {0:"Not Observed",1:"Below Expectations",2:"Needs Improvement",3:"Meets Expectations",4:"Exceeds Expectations",5:"Exceptional"};
+
+var _spSiteId = null;
+
+function getGraphToken() {
+  var accounts = msalInstance.getAllAccounts();
+  if (accounts.length === 0) return Promise.reject(new Error('Not signed in. Please sign in first.'));
+  return msalInstance.acquireTokenSilent({
+    scopes: ['Files.ReadWrite.All','Sites.ReadWrite.All'],
+    account: accounts[0]
+  }).catch(function() {
+    return msalInstance.acquireTokenPopup({
+      scopes: ['Files.ReadWrite.All','Sites.ReadWrite.All']
+    });
+  }).then(function(resp) { return resp.accessToken; });
+}
+
+function graphFetch(token, url, opts) {
+  opts = opts || {};
+  opts.headers = opts.headers || {};
+  opts.headers['Authorization'] = 'Bearer ' + token;
+  if (opts.body) opts.headers['Content-Type'] = 'application/json';
+  return fetch(url, opts).then(function(r) {
+    if (r.status === 204) return {};
+    return r.json().then(function(d) {
+      if (d.error) throw new Error(d.error.message || 'Graph API error');
+      return d;
+    });
+  });
+}
+
+function getSiteId(token) {
+  if (_spSiteId) return Promise.resolve(_spSiteId);
+  return graphFetch(token, 'https://graph.microsoft.com/v1.0/sites/' + SP_CONFIG.siteHost + ':' + SP_CONFIG.sitePath)
+    .then(function(d) { _spSiteId = d.id; return d.id; });
+}
+
+function sheetUrl(siteId) {
+  return 'https://graph.microsoft.com/v1.0/sites/' + siteId + '/drive/items/' + SP_CONFIG.fileId + "/workbook/worksheets('" + SP_CONFIG.sheet + "')";
+}
+
+function ensureHeaders(token, siteId) {
+  var base = sheetUrl(siteId);
+  return graphFetch(token, base + "/range(address='A1')").then(function(d) {
+    if (d.values && d.values[0] && d.values[0][0]) return; // headers exist
+    return graphFetch(token, base + "/range(address='A1:AP1')", {
+      method: 'PATCH',
+      body: JSON.stringify({ values: [REVIEW_HEADERS] })
+    });
+  });
+}
+
+function findExistingRow(token, siteId, employee, period) {
+  var base = sheetUrl(siteId);
+  return graphFetch(token, base + '/usedRange').then(function(d) {
+    if (!d.values || d.values.length <= 1) return null;
+    for (var i = 1; i < d.values.length; i++) {
+      if (d.values[i][3] === employee && d.values[i][0] === period) return i + 1; // 1-based row
+    }
+    return null;
+  });
+}
+
+function writeRow(token, siteId, rowNum, rowData) {
+  var base = sheetUrl(siteId);
+  var addr = 'A' + rowNum + ':AP' + rowNum;
+  return graphFetch(token, base + "/range(address='" + addr + "')", {
+    method: 'PATCH',
+    body: JSON.stringify({ values: [rowData] })
+  });
+}
+
+function getNextRow(token, siteId) {
+  var base = sheetUrl(siteId);
+  return graphFetch(token, base + '/usedRange').then(function(d) {
+    return (d.rowCount || 1) + 1;
+  });
+}
+
+function buildRowData(employee, period, manager, census, perfData, eligible, whatGoing, needsImprovement, cjr, cv, kpi1, kpi2, kpi3) {
+  var leads = perfData.leads || [];
+  var kpiRawPts = perfData.totalPts || 0;
+  var kpiRawMax = perfData.maxPts || 0;
+  var kpi15 = kpiRawMax > 0 ? Math.round((kpiRawPts / kpiRawMax) * 15 * 10) / 10 : 0;
+  var overallPts = Math.round((kpi15 + cjr + cv) * 10) / 10;
+  var overallMax = 30;
+  var overallPct = Math.round((overallPts / overallMax) * 100 * 10) / 10;
+  var salary = census.salary || 0;
+  var bonusRate = 0.10;
+  var bonusAmt = eligible ? Math.round((salary / 2) * bonusRate * (overallPct / 100) * 100) / 100 : 0;
+  var now = new Date();
+  var dateStr = (now.getMonth()+1) + '/' + now.getDate() + '/' + now.getFullYear();
+
+  var row = [
+    period, manager, dateStr, employee,
+    census.title || '', census.dept || '',
+    eligible ? 'Yes' : 'No',
+    whatGoing, needsImprovement,
+    perfData.wigName || '', perfData.wigPct || '', perfData.wigScore || '', perfData.wigPts || ''
+  ];
+  for (var i = 0; i < 4; i++) {
+    if (i < leads.length) {
+      row.push(leads[i].n || '', leads[i].p || '', leads[i].s || '');
+    } else {
+      row.push('', '', '');
+    }
+  }
+  row.push(kpiRawPts, kpiRawMax, perfData.overallPct || '', perfData.perfLevel || '');
+  row.push(kpi1, kpi2, kpi3);
+  row.push(cjr, CJR_LABELS[cjr] || '', cv, CV_LABELS[cv] || '');
+  row.push(overallPts, overallMax, overallPct, salary, '10%', bonusAmt);
+  return row;
+}
+
+function submitReview() {
+  if (!selectedEmployee) { alert('Please select an employee'); return; }
+
+  var census = CENSUS_DATA[selectedEmployee] || {};
+  var perfData = PERF_DATA[selectedEmployee] || {};
+  var eligible = coreJobEligible === true;
+  var whatGoing = document.getElementById('whatGoing').value || '';
+  var needsImprovement = document.getElementById('needsImprovement').value || '';
+  var kpi1 = document.getElementById('kpi1Display') ? document.getElementById('kpi1Display').textContent : '';
+  var kpi2 = document.getElementById('kpi2Display') ? document.getElementById('kpi2Display').textContent : '';
+  var kpi3 = document.getElementById('kpi3Display') ? document.getElementById('kpi3Display').textContent : '';
+
+  var rowData = buildRowData(selectedEmployee, currentPeriod, loggedInManager, census, perfData, eligible, whatGoing, needsImprovement, cjrScore, cvConsolidatedScore, kpi1, kpi2, kpi3);
+
+  var btn = document.querySelector('[onclick="submitReview()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting to SharePoint...'; }
+
+  var token, siteId;
+  getGraphToken()
+    .then(function(t) { token = t; return getSiteId(token); })
+    .then(function(sid) { siteId = sid; return ensureHeaders(token, siteId); })
+    .then(function() { return findExistingRow(token, siteId, selectedEmployee, currentPeriod); })
+    .then(function(existingRow) {
+      if (existingRow) {
+        return writeRow(token, siteId, existingRow, rowData).then(function() { return { row: existingRow, action: 'updated' }; });
+      } else {
+        return getNextRow(token, siteId).then(function(nextRow) {
+          return writeRow(token, siteId, nextRow, rowData).then(function() { return { row: nextRow, action: 'saved' }; });
+        });
+      }
+    })
+    .then(function(result) {
+      saveDraft();
+      alert('Review for ' + selectedEmployee + ' has been ' + result.action + ' in SharePoint (row ' + result.row + ').');
+    })
+    .catch(function(err) {
+      alert('Error saving to SharePoint: ' + err.message);
+    })
+    .finally(function() {
+      if (btn) { btn.disabled = false; btn.textContent = 'Submit Review'; }
+    });
+}
+
+function loadCompletedReviews() {
+  const tbody = document.getElementById('reviewsTableBody');
+  tbody.innerHTML = '';
+  
+  const reviews = [];
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('pmDraft_'));
+  
+  keys.forEach(k => {
+    const data = JSON.parse(localStorage.getItem(k));
+    reviews.push(data);
+  });
+  
+  if (reviews.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No reviews saved yet</td></tr>';
+    return;
+  }
+  
+  reviews.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(r => {
+    const row = document.createElement('tr');
+    const perfData = PERF_DATA[r.employee] || {};
+    const census = CENSUS_DATA[r.employee] || {};
+    const salary = census.salary || 0;
+    const bonusRate = 0.10;
+    // Recalc 4DX without XPS, normalize to 15
+    var rKpiRawPts = (perfData.wigPts || 0);
+    var rKpiRawMax = 6;
+    if (perfData.leads) { perfData.leads.forEach(function(l) { rKpiRawPts += (l.s||0); rKpiRawMax += 3; }); }
+    var rKpi15 = rKpiRawMax > 0 ? Math.round((rKpiRawPts / rKpiRawMax) * 15 * 10) / 10 : 0;
+    const totalPts = rKpi15 + (r.cjrScore || 0) + (r.cvScore || 0);
+    const maxPts = 30;
+    const overallPct = (totalPts / maxPts) * 100;
+    const bonusAmount = r.eligible ? (salary / 2) * bonusRate * (overallPct / 100) : 0;
+
+    row.innerHTML = '<td>' + escapeHtml(r.employee) + '</td><td>' + r.period + '</td><td><span class="complete">Complete</span></td><td><span class="' + (r.eligible ? 'complete' : 'pending') + '">' + (r.eligible ? 'Eligible' : 'Not Eligible') + '</span></td><td>' + formatCurrency(bonusAmount) + '</td>';
+    tbody.appendChild(row);
+  });
+}
+
+window.onload = initPage;
+</script>
+
+</body>
+</html>
